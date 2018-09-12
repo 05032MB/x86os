@@ -1,7 +1,7 @@
 #ifndef _BFS_H
 #define _BFS_H
 
-#include <types.h>
+#include <types.hpp>
 
 struct bfs_superblock{
 	dword magic;

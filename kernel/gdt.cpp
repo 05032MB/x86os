@@ -1,4 +1,4 @@
-#include <gdt.h>
+#include <gdt.hpp>
 
 gdtptr gdtp;
 gdtentry gdt[GDTMAX];

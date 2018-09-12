@@ -1,4 +1,4 @@
-﻿#include <critical.h>
+﻿#include <critical.hpp>
 
 __attribute__((noinline, noreturn))
 void kpanic(const char *s)

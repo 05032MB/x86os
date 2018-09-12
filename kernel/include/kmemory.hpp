@@ -1,8 +1,8 @@
 ﻿#ifndef _KMEMORY_H
 #define _KMEMORY_H
 
-#include <types.h>
-#include <critical.h>
+#include <types.hpp>
+#include <critical.hpp>
 
 #define PTSIZE 1024
 

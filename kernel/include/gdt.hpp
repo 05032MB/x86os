@@ -1,7 +1,7 @@
 ﻿#ifndef _GDT_H
 #define _GDT_H
 
-#include <types.h>
+#include <types.hpp>
 
 
 #define SEG_DESCTYPE(x)  ((x) << 0x04) // Descriptor type (0 for system, 1 for code/data)

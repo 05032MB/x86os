@@ -1,4 +1,4 @@
-﻿#include <interrupts.h>
+﻿#include <interrupts.hpp>
 
 idtptr idtp;
 idtseg idt[INTTOP];

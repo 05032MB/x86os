@@ -1,4 +1,4 @@
-﻿#include <kmemory.h>
+﻿#include <kmemory.hpp>
 
 ALIGNED_4kB//4KiB in bytes; 4KiB aligned
 dword page_directory[PTSIZE]; //4KiB /32 = 1024

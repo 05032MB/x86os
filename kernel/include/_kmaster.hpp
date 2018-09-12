@@ -3,10 +3,10 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <types.h>
-#include <interrupts.h>
-#include <kmemory.h>
-#include <gdt.h>
+#include <types.hpp>
+#include <interrupts.hpp>
+#include <kmemory.hpp>
+#include <gdt.hpp>
 
 void term_clear(char bchar);
 void term_init();

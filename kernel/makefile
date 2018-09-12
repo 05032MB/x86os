@@ -37,7 +37,7 @@ clean:
 	rm -f $(OBJS)
 	rm -f os.bin
 	
-%.o : %.cpp %.h
+%.o : %.cpp %.hpp
 	 $(CXX) -c  $< -o $@ $(CPPFLAGS)
 %.oa : %.asm
 	$(ASM) -felf32 $< -o $@

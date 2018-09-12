@@ -1,9 +1,9 @@
 ﻿#ifndef _INTERRUPTS_H
 #define _INTERRUPTS_H
 
-#include <types.h>
-#include <ports.h>
-#include <gdt.h>
+#include <types.hpp>
+#include <ports.hpp>
+#include <gdt.hpp>
 
 
 #include <string.h>

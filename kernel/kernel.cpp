@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "types.h"*/
 
-#include "_kmaster.h"
+#include "_kmaster.hpp"
 
 #include <cpuid.h>
 #include "../lib/include/stdlib.h"
@@ -11,8 +11,8 @@
 
   #define ARRSIZE(x)  (sizeof(x) / sizeof((x)[0]))
   
-#include "ports.h"
-#include "input.h"
+#include "ports.hpp"
+#include "input.hpp"
  
 // First, let's do some basic checks to make sure we are using our x86-elf cross-compiler correctly
 #if defined(__linux__)
