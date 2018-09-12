@@ -1,0 +1,10 @@
+﻿*.o
+*.oa
+*.a
+*.docx
+*.txt
+*.7z
+**/junk
+*/compiler
+/lib/*.bat
+/compiler
