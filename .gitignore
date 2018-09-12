@@ -4,6 +4,7 @@
 *.docx
 *.txt
 *.7z
+*.bin
 **/junk
 */compiler
 /lib/*.bat
