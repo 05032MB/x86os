@@ -1,7 +1,7 @@
 #ifndef _OS_H
 #define _OS_H
 
-#include <types.h>
+#include <types.hpp>
 
 
 #ifdef __cplusplus 
