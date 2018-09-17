@@ -3,7 +3,7 @@ DEST=objs/
 LIBK=../lib/libk.a
 
 CXX:=i686-elf-g++
-AR:=i686-elf-ar
+#AR:=i686-elf-ar
 ASM:=nasm
 
 #CFLAGS:=$(CFLAGS) -ffreestanding -Wall -Wextra

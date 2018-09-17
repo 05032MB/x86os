@@ -2,10 +2,15 @@ ENTRY(_entry)
 
 SECTIONS
 {
+	
+	prekernel =.;
+	
 	. = 1M;
 
+	
 	.text BLOCK(4K) : ALIGN(4K)
 	{
+		begkernel = .;
 		*(.multiboot)
 		*(.text)
 	}
@@ -23,11 +28,13 @@ SECTIONS
 	.bss BLOCK(4K) : ALIGN(4K)
 	{
 		*(COMMON)
-		*(.bss)
+		*(.bss)	
+		endkernel = .;
 	}
 	.junk BLOCK(4K) : ALIGN(4K)
 	{
 		*(.junk)
+
 	}
 
 }

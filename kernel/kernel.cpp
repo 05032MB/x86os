@@ -1,10 +1,5 @@
-﻿/*#include <stddef.h>
-#include <stdint.h>
-#include "types.h"*/
+﻿#include <_kmaster.hpp>
 
-#include "_kmaster.hpp"
-
-#include <cpuid.h>
 #include "../lib/include/stdlib.h"
 #include <stdio.h>
 

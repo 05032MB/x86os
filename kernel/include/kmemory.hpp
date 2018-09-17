@@ -14,8 +14,8 @@ void init_paging();
 //----------------------
 	/*Page table ebtry structure explained
 	-----------------------------------------------------------------------------------------------------------------------------------------
-    | 31-12|                                  |11...9		 |8		|7  |6		   |5	    |4	        |3			 |2			  	 |1		    |0	    |bits
-    |Address of frame (lower 12 bits set to 0)|Bits for me :)|Global|0  |DirtyBit  |Accessed|DisablCache|WriteThrough|Supervisor/User|Read/Write|Present|function
+    | 31-12|                                  |11...9		 |8		|7  |6		   |5	    |4	        |3			 |2			  		   |1		    |0	    |bits
+    |Address of frame (lower 12 bits set to 0)|Bits for me :)|Global|0  |DirtyBit  |Accessed|DisablCache|WriteThrough|Supervisor(0)/User(1)|Read/Write  |Present|function
 	-----------------------------------------------------------------------------------------------------------------------------------------
 	*/
 #define ENTR_GLOBAL(x) x<<8
@@ -44,6 +44,10 @@ extern ALIGNED_4kB dword page_directory[PTSIZE];
 extern ALIGNED_4kB dword page_table_primary[PTSIZE];
 
 bool set_page_dir(dword);
+
+extern unsigned int endkernel; //from linkerscript, address of kernel ending
+extern unsigned int begkernel; //from linkerscript, address of kernel beginning
+extern unsigned int prekernel;
 
 //assembly functions
 extern "C"{

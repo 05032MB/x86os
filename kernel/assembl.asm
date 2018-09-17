@@ -17,6 +17,8 @@ KERNEL_DS resw 1;kernel data segment selector
 USER_CS resw 1
 USER_DS resw 1
 
+;vl resw 256*1024*1024; 1GB
+
 section .text
 
 
@@ -171,6 +173,9 @@ exp _write_cr3:
 	mov cr3, ecx
 	ret
 	
+exp _invlpg:
+	invlpg [ecx]
+	ret
 ;;;;;;;INTERRUPT SERVICE ROUTINES!!;;;;;;;;
 ;Format-------
 ;isr###:
