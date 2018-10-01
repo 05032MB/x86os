@@ -1,5 +1,17 @@
 ﻿#include <kmemory.hpp>
 
+#ifdef __k_debug
+#include <stdio.h>
+#include <stdlib.h>
+__attribute__((used))
+static void dputs(int a)
+{
+	char tr[50];
+	itoa(a, tr, 10);
+	puts(tr);
+}
+#endif
+
 static void* memset(void* bufptr, int value, size_t size) {
 	unsigned char* buf = (unsigned char*) bufptr;
 	for (size_t i = 0; i < size; i++)
@@ -92,6 +104,7 @@ heap::heap(addr_t a, size_t s){
 bool heap::add_block(size_t s, addr_t address, bool empty)
 {
 	if(address < to_addr_t(begheap))return false ;
+	if(s == 0)return false;
 	heap::block temp;
 	temp.size = s;
 	temp.address = (void*)address;
@@ -127,11 +140,12 @@ void * heap::__alloc(size_t size)
 	{
 		if(blocks_empty.lookup(i).size >= size)
 		{
+			heap::block temp = blocks_empty.lookup(i);
 			move_block_to_full(i);
 			
 			//split block if possible
 			
-			return blocks_full.lookup(i).address;
+			return temp.address;
 		}
 	}
 	
@@ -140,26 +154,31 @@ void * heap::__alloc(size_t size)
 	currheap = (void*) size+to_addr_t(currheap);
 	return (void*)ret;
 }
+
 void * heap::__aalloc(size_t size, size_t alignment) //only works with 2^n alignment
 {
 	for(size_t i =0; i<blocks_empty.get_size(); i++)
 	{
-		if(blocks_empty.lookup(i).size >= size && (to_addr_t(blocks_empty.lookup(i).address)%alignment == 1))
+		if(blocks_empty.lookup(i).size >= size && (to_addr_t(blocks_empty.lookup(i).address)%alignment == 0))
 		{
+			heap::block temp = blocks_empty.lookup(i);
 			move_block_to_full(i);
 			
 			//split block if possible
 			
-			return blocks_full.lookup(i).address;
+			return temp.address;
 		}
 	}
 	
 	addr_t nearest_aligned = to_addr_t(currheap) & ~(alignment-1);
 	
+	while(nearest_aligned<=to_addr_t(currheap)){nearest_aligned += alignment;}
+	
 	add_block(nearest_aligned - to_addr_t(currheap), to_addr_t(currheap) ,true);
 	add_block(size, nearest_aligned, false);
 	addr_t ret = to_addr_t(nearest_aligned);
 	currheap = (void*) size+to_addr_t(nearest_aligned);
+	
 	return (void*)ret;
 }
 
@@ -192,21 +211,16 @@ void * kalloc(void* currheap,size_t size, bool align, addr_t begheap) //dangerou
 }
 #pragma GCC diagnostic pop
 
-#ifdef __k_debug
-#include <stdio.h>
-#include <stdlib.h>
-__attribute__((used))
-static void dputs(int a)
-{
-	char tr[50];
-	itoa(a, tr, 10);
-	puts(tr);
-}
-#endif
 
 void init_heap()
 {
-	heap sysheap(0x200000,300); //start address, max blocks amount
-	
+	heap sysheap(0x200000,300); //start address, max blocks amount	
+	/*int *ptr3 = (int*)sysheap.__alloc(8);
+	int *ptr = (int*)sysheap.__aalloc(8,1024);
+	int *ptr2 = (int*)sysheap.__alloc(8);
+
+	dputs(to_addr_t(ptr3));
+	dputs(to_addr_t(ptr));
+	dputs(to_addr_t(ptr2));*/
 
 }
