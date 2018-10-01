@@ -15,5 +15,8 @@ typedef int32_t sdword;
 //typedef int64_t sqword;
 
 typedef word paddr;
+typedef dword addr_t;
+
+typedef long unsigned int size_t;
 
 #endif //TYPES_H

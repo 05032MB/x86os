@@ -42,7 +42,7 @@ clean:
 %.oa : %.asm
 	$(ASM) -felf32 $< -o $@
 	
-adolf:
+sources:
 	echo $(SOURCES)
-hitler:
+targets:
 	echo $(OBJS)

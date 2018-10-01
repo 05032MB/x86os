@@ -35,9 +35,9 @@ clean:
 %.o : %.c %.h
 	$(CC) -c  $< -o $@ $(LIBK_CFLAGS) $(LIBK_CPPFLAGS)
 
-adolf:
+sources:
 	echo $(SOURCES)
-hitler:
+targets:
 	echo $(LIBOBJS)
 #$(LIBOBJS): $(SOURCES)
 #	$(CC) -c $< -o $@ $(CFLAGS) $(CPPFLAGS)

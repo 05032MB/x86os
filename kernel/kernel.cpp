@@ -1,13 +1,5 @@
 ﻿#include <_kmaster.hpp>
 
-#include "../lib/include/stdlib.h"
-#include <stdio.h>
-
-
-  #define ARRSIZE(x)  (sizeof(x) / sizeof((x)[0]))
-  
-#include "ports.hpp"
-#include "input.hpp"
  
 // First, let's do some basic checks to make sure we are using our x86-elf cross-compiler correctly
 #if defined(__linux__)
@@ -182,14 +174,16 @@ extern "C" void kernel_main()
 	init_paging();
 	term_print("Paging is ready\n");
 	//asm("INT $102");
+	init_heap();
  
 	term_print("Hello, World!\n", VGA_COLOR_GREEN);
 	term_print("Welcome to the kernel.\n", VGA_COLOR_CYAN << 4);
 	
 	term_print("Boot completed\n");
+	term_print("----------------------\n",VGA_COLOR_MAGENTA);
 	
 	
-	term_print("\nPress any key (3 to triple fault)\n");
+	term_print("\nPress any key (3 to GP fault)\n");
 	while(1){
 	char c = get();
 		term_putc(c);

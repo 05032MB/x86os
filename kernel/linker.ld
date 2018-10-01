@@ -7,10 +7,10 @@ SECTIONS
 	
 	. = 1M;
 
-	
+	begkernel = .;
 	.text BLOCK(4K) : ALIGN(4K)
 	{
-		begkernel = .;
+
 		*(.multiboot)
 		*(.text)
 	}

@@ -7,6 +7,16 @@
 #include <interrupts.hpp>
 #include <kmemory.hpp>
 #include <gdt.hpp>
+#include <paging.hpp>
+
+#include <stdlib.h>
+#include <stdio.h>
+
+
+  #define ARRSIZE(x)  (sizeof(x) / sizeof((x)[0]))
+  
+#include <ports.hpp>
+#include <input.hpp>
 
 void term_clear(char bchar);
 void term_init();

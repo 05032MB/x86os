@@ -4,59 +4,94 @@
 #include <types.hpp>
 #include <critical.hpp>
 
-#define PTSIZE 1024
+#define to_addr_t(x) (addr_t)x
 
-#define ALIGNED_4kB __attribute__((aligned(4096)))
-#define ALIGNED_4MB __attribute__((aligned(4194304)))
+template<typename T>
+sword less_than(T a, T b);
 
-void init_paging();
+template<typename T>
+class heaparray{
+	
+	public:
+	typedef sword (*comparator_func_t)(T, T);
+	
+	private:
+	size_t size;
+	size_t maxsize;
+	T* pointer;
+	comparator_func_t standard_comparator; //comparator
+	
 
-//----------------------
-	/*Page table ebtry structure explained
-	-----------------------------------------------------------------------------------------------------------------------------------------
-    | 31-12|                                  |11...9		 |8		|7  |6		   |5	    |4	        |3			 |2			  		   |1		    |0	    |bits
-    |Address of frame (lower 12 bits set to 0)|Bits for me :)|Global|0  |DirtyBit  |Accessed|DisablCache|WriteThrough|Supervisor(0)/User(1)|Read/Write  |Present|function
-	-----------------------------------------------------------------------------------------------------------------------------------------
-	*/
-#define ENTR_GLOBAL(x) x<<8
-#define ENTR_DIRTY(x) x<<6	
+	static void swap(T&, T&);
+	
+	public:
+	heaparray(size_t maxsize, comparator_func_t comparator_method); //alloc exists (not implemented)
+	heaparray(T* addr, size_t maxsize, comparator_func_t comparator_method); //no alloc
+	heaparray(){};
+	
+	void init_no_alloc(T* addr, size_t maxsize, comparator_func_t comparator_method); 
+	
+	bool insert(T sth);
+	T lookup(size_t element);
+	T remove(size_t element);
+	
+	size_t get_size(){return this->size;}
+	size_t get_max_size(){return this->maxsize;}
+	
+	~heaparray();
 
+};
 
-	/*Page directory entry structure explained
-	-----------------------------------------------------------------------------------------------------------------------------------------------------------
-    | 31-12|                                  |11...9		 |8			|7		   |6	|5		 |4	         |3			  |2		      |1		 |0	     |bits
-    |Address of frame (lower 12 bits set to 0)|Bits for me :)|Ignored   |PageSize  |0	|Accessed|DisablCache|WriteThrough|User/Supervisor|Read/Write|Present|function
-	-----------------------------------------------------------------------------------------------------------------------------------------------------------
-	set 7 to 1 to align 4MiB, otherwise it's 4KiB aligned
-	*/
-#define ENTR_SIZE(x) x<<7
-#define ENTR_ACCESSED(x) x<<5
-#define ENTR_CACHE(x) x<<4
-#define ENTR_WRITETHROUGH(x) x<<3
-#define ENTR_USER(x) x<<2
-#define ENTR_RW(x) x<<1
-#define ENTR_PRESENT(x) x
-//----------------
+class heap{
+	void * begheap;
+	void * endheap; //unused
+	void * currheap;
+	
+	public:
+	 struct block{
+		size_t size;
+		void* address;
+	
+	}__attribute__((packed));
+	
+	private:
+	heaparray<block> blocks_empty;	
+	heaparray<block> blocks_full;	
+	
+	static sword less_than_heap(block a, block b){ //increasing order
+			return a.size > b.size ? 1 : 0;
+	}
+	size_t maxsize;	
+	
+	bool add_block(size_t s, addr_t address, bool empty);
+	bool move_block_to_empty(size_t num);
+	bool move_block_to_full(size_t num);
+	
+	bool divide_block(void*, size_t);
+	bool destroy_block();
+	
+	public:
+	
+	heap(addr_t, size_t);
+	heap() {}; //nothing
+	
+	void *__alloc(size_t size);
+	void *__aalloc(size_t size, size_t align); //align alloc
+	void __dealloc(void* ptr);
+	void __realloc(void* ptr, size_t size); //not yet implemented
+	
+	size_t get_heap_size(){return to_addr_t(currheap)-to_addr_t(begheap);};
+	
+	void free(void* ptr);
 
+};
 
-//---------------
-extern ALIGNED_4kB dword page_directory[PTSIZE];
-extern ALIGNED_4kB dword page_table_primary[PTSIZE];
+void * kalloc(void* a,size_t size, bool align, addr_t);
 
-bool set_page_dir(dword);
+void init_heap(void);
 
-extern unsigned int endkernel; //from linkerscript, address of kernel ending
-extern unsigned int begkernel; //from linkerscript, address of kernel beginning
-extern unsigned int prekernel;
-
-//assembly functions
-extern "C"{
- dword _get_cr0(void);
- dword _get_cr3(void);
- 
- void __attribute__((fastcall)) _write_cr0(dword);
- void __attribute__((fastcall)) _write_cr3(dword);
- 
-}
+extern void* endkernel; //from linkerscript, address of kernel ending
+extern void* begkernel; //from linkerscript, address of kernel beginning
+extern void* prekernel; //0,propably
 
 #endif

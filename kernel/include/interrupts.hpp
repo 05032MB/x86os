@@ -79,7 +79,9 @@ void init_interrupts();
 void idt_install();
 bool init_idt_segs();
 bool init_idt_seg(idtseg* ptr, int selector, int flags, int offset2);
-	
+
+extern void page_fault_handler(const int_iden); //in paging.hpp
+
 extern "C" {
 	
 	void _cli();
@@ -89,10 +91,10 @@ extern "C" {
 	
 	void _c_int_handler(int_iden ii); 
 //----
-	dword get_int_handler(); 
+	addr_t get_int_handler(); 
 
 	dword _get_isr_size(); 
-	dword _get_isr0_addr(); 
+	addr_t _get_isr0_addr(); 
 
 	void int_handler(); 
 /* pushad exec popad iret */

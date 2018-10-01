@@ -4,6 +4,8 @@ gdtptr gdtp;
 gdtentry gdt[GDTMAX];
 
 #ifdef __k_debug
+#include <stdio.h>
+#include <stdlib.h>
 __attribute__((used))
 static void dputs(int a)
 {
