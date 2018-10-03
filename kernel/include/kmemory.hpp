@@ -58,6 +58,8 @@ class heap{
 	heaparray<block> blocks_empty;	
 	heaparray<block> blocks_full;	
 	
+	#define MINSPLITSIZE 1
+	
 	static sword less_than_heap(block a, block b){ //increasing order
 			return a.size > b.size ? 1 : 0;
 	}
@@ -66,8 +68,8 @@ class heap{
 	bool add_block(size_t s, addr_t address, bool empty);
 	bool move_block_to_empty(size_t num);
 	bool move_block_to_full(size_t num);
+	heap::block find_by_address(addr_t address);
 	
-	bool divide_block(void*, size_t);
 	bool destroy_block(size_t num, bool empty);
 	
 	public:

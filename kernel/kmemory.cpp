@@ -126,6 +126,20 @@ bool heap::move_block_to_full(size_t num)
 	
 	return blocks_full.insert(blocks_empty.remove(num));
 }
+bool heap::destroy_block(size_t num, bool empty)
+{
+	if(empty)
+	{
+		if(num >= blocks_empty.get_size())return false;
+		blocks_empty.remove(num);
+		return true;
+	}
+	
+	if(num >= blocks_full.get_size())return false;
+	blocks_full.remove(num);
+	return true;
+
+}
 
 void heap::free(void* ptr)
 {
@@ -141,9 +155,16 @@ void * heap::__alloc(size_t size)
 		if(blocks_empty.lookup(i).size >= size)
 		{
 			heap::block temp = blocks_empty.lookup(i);
-			move_block_to_full(i);
 			
-			//split block if possible
+			//dputs(temp.size - size);
+			if(temp.size - size >= MINSPLITSIZE)
+			{
+				destroy_block(i, true);
+				add_block(size, to_addr_t(temp.address), false);
+				add_block(temp.size-size, to_addr_t(temp.address)+size, true);
+			}else move_block_to_full(i);
+			
+		
 			
 			return temp.address;
 		}
@@ -162,9 +183,13 @@ void * heap::__aalloc(size_t size, size_t alignment) //only works with 2^n align
 		if(blocks_empty.lookup(i).size >= size && (to_addr_t(blocks_empty.lookup(i).address)%alignment == 0))
 		{
 			heap::block temp = blocks_empty.lookup(i);
-			move_block_to_full(i);
 			
-			//split block if possible
+			if(temp.size - size >= MINSPLITSIZE)
+			{
+				destroy_block(i, true);
+				add_block(size, to_addr_t(temp.address), false);
+				add_block(temp.size-size, to_addr_t(temp.address)+size, true);
+			}else move_block_to_full(i);
 			
 			return temp.address;
 		}
@@ -190,8 +215,28 @@ void heap::__dealloc(void * ptr)
 	{
 		if(to_addr_t(blocks_full.lookup(i).address) == to_addr_t(ptr))
 		{
-			this->move_block_to_empty(i);
-			//merge adjancent blocks
+			heap::block temp = blocks_full.lookup(i);
+			addr_t nextaddr = to_addr_t(temp.address) + temp.size;
+			
+			bool merged = false;
+			
+			for(size_t z = 0; z<blocks_empty.get_size();z++)
+			{
+				if(to_addr_t(blocks_empty.lookup(z).address) == nextaddr){
+					heap::block tmp2 = blocks_empty.lookup(z);
+				
+					destroy_block(z, true);
+					add_block(temp.size + tmp2.size, to_addr_t(temp.address), true);
+					
+					merged = true;
+					
+					break;
+				}
+			} 
+			
+			if(!merged)this->move_block_to_empty(i);
+			//find out how to efficintly do the same on 'left' side
+			
 			return;
 		}
 	}
@@ -215,14 +260,18 @@ heap sysheap;
 	
 void init_heap()
 {
-	sysheap = heap(0x200000,300); //start address, max blocks amount	
+	sysheap = heap(to_addr_t(endkernel),300); //start address, max blocks amount	
 
 	/*int *ptr3 = (int*)sysheap.__alloc(8);
 	int *ptr = (int*)sysheap.__aalloc(8,1024);
 	int *ptr2 = (int*)sysheap.__alloc(8);
+	sysheap.__dealloc(ptr2);
+	ptr2 = (int*)sysheap.__alloc(100);
+	int *ptr4 = (int*)sysheap.__alloc(8);
 
 	dputs(to_addr_t(ptr3));
 	dputs(to_addr_t(ptr));
-	dputs(to_addr_t(ptr2));*/
+	dputs(to_addr_t(ptr2));
+	dputs(to_addr_t(ptr4));*/
 
 }
