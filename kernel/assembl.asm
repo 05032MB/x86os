@@ -62,7 +62,6 @@ exp get_int_handler:
 
 ;assembly 32 bit int handling func
 exp int_handler:
-	cli ;tymczasowe rozwi¹zanie, nie za du¿o rozwi¹zuje
 	pushad
 	
 	push ds
@@ -187,7 +186,7 @@ exp _invlpg:
 ;;;;;;;;macros;;;;;;;;;;;;;;;;;;;;;;;
 %macro ISR_NOERROR 1
 isr%1:
-	;cli
+	cli
 	push dword 0
 	push %1
 	jmp long int_handler ;force long jump
@@ -195,7 +194,7 @@ isr%1:
 
 %macro ISR_ERROR 1
 isr%1:
-	;cli
+	cli
 	nop
 	nop ; push 0
 	push %1

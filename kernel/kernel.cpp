@@ -21,6 +21,12 @@
 	//_push(10);
 	asm("INT $101");//9 is good
  }
+ void page_fault()
+ {
+	int * pointerofdoom = (int*)0xFFFFFFF;
+	*pointerofdoom = 23;
+ 
+ }
  
 
 #include <stdlib.h>
@@ -51,6 +57,7 @@ extern "C" void kernel_main()
 	char c = get();
 		term_putc(c);
 		if(c=='3')triple_fault();
+		if(c=='4')page_fault();
 		//char c = getScancode();
 		//term_putc(c);
 	}
