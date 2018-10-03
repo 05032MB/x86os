@@ -14,14 +14,11 @@
 
 
   #define ARRSIZE(x)  (sizeof(x) / sizeof((x)[0]))
-  
-#include <ports.hpp>
+ 
 #include <input.hpp>
+#include <vga.hpp>
 
-void term_clear(char bchar);
-void term_init();
-void term_putc(char c, uint8_t color);
-void term_print(const char* str, uint8_t color);
+
 
 //Assembler functions
 

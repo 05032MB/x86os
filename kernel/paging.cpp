@@ -40,6 +40,12 @@ void * translate_virtual_to_physical(void * virtualaddr)
 	//void * addr = (void *)(pt[pti] & 
 }
 
+void init_frame()
+{
+
+
+}
+
 void page_fault_handler(const int_iden ii)
 {
 	addr_t fault_loc;

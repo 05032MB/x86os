@@ -1,7 +1,8 @@
 ﻿ #ifndef PORTS_H
  #define PORTS_H
  
-
+#include <types.hpp>
+ 
  //extern "C" __attribute__((fastcall)) void outb(uint16_t port, uint8_t val); 
  //extern "C" __attribute__((fastcall)) void inb(uint16_t port); 
  

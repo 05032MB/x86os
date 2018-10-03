@@ -29,7 +29,7 @@ OBJS:=$(AOBJS) $(COBJS)
 
 
 all: os.bin
-	 $(CXX) -T linker.ld -o os.bin -ffreestanding -O2 -nostdlib $(OBJS) $(LIBK) -lgcc
+	 $(CXX) -T linker.ld -o os.bin -ffreestanding -O2 -mcmodel=large -nostdlib $(OBJS) $(LIBK) -lgcc
 
 os.bin: $(OBJS)
 
