@@ -21,6 +21,18 @@ $(CSOURCES:.cpp=.o)
 AOBJS=\
 $(ASOURCES:.asm=.oa)
 
+CRTBEGIN_OBJ:=$(shell $(CXX) $(CPPFLAGS) -print-file-name=crtbegin.o)
+CRTEND_OBJ:=$(shell $(CXX) $(CPPFLAGS) -print-file-name=crtend.o)
+
+LINK_LIST=\
+crti.oa \
+$(CRTBEGIN_OBJ) \
+$(COBJS) \
+$(AOBJS) \
+$(LIBK) \
+$(CRTEND_OBJ) \
+crtn.oa
+
 SOURCES:=$(CSOURCES) $(ASOURCES)
 
 OBJS:=$(AOBJS) $(COBJS)
@@ -29,17 +41,20 @@ OBJS:=$(AOBJS) $(COBJS)
 
 
 all: os.bin
-	 $(CXX) -T linker.ld -o os.bin -ffreestanding -O2 -mcmodel=large -nostdlib $(OBJS) $(LIBK) -lgcc
+	 $(CXX) -T linker.ld -o os.bin -ffreestanding -O2 -nostdlib $(LINK_LIST) -lgcc
 
-os.bin: $(OBJS)
+os.bin: $(OBJS) crtn.oa crti.oa
 
 clean:
 	rm -f $(OBJS)
+	rm -f $(AOBJS)
 	rm -f os.bin
 	
 %.o : %.cpp %.hpp
 	 $(CXX) -c  $< -o $@ $(CPPFLAGS)
 %.oa : %.asm
+	$(ASM) -felf32 $< -o $@
+%.oa : %.spec
 	$(ASM) -felf32 $< -o $@
 	
 sources:

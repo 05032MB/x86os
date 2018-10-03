@@ -59,10 +59,15 @@ void page_fault_handler(const int_iden ii)
 
 void init_paging()
 {
-
 	populate_page_directory();
 	init_primary_page_table();
 	
 	_write_cr3((dword)&page_directory);
 	_write_cr0(0x80000000 | _get_cr0());
+}
+
+void init_paging_phase2()
+{
+	
+
 }

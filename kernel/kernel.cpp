@@ -22,7 +22,6 @@
 	asm("INT $101");//9 is good
  }
  
-extern "C" void halt();
 
 #include <stdlib.h>
 
@@ -37,7 +36,7 @@ extern "C" void kernel_main()
 	term_print("Interrupts are configured\n");
 	init_paging();
 	term_print("Paging is ready\n");
-	//asm("INT $102");
+
 	init_heap();
  
 	term_print("Hello, World!\n", VGA_COLOR_GREEN);

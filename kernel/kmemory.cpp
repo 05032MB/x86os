@@ -71,7 +71,7 @@ bool heaparray<T>::insert(T elem)
 template<typename T>
 T heaparray<T>::lookup(size_t index)
 {
-	if(index >= this->size)__asm__("ret");
+	if(index >= this->size)kpanic("This system is not supporting exceptions, so it panics");//__asm__("ret");what was that
 	return this->pointer[index];
 }
 template<typename T>
@@ -211,10 +211,12 @@ void * kalloc(void* currheap,size_t size, bool align, addr_t begheap) //dangerou
 }
 #pragma GCC diagnostic pop
 
-
+heap sysheap;
+	
 void init_heap()
 {
-	heap sysheap(0x200000,300); //start address, max blocks amount	
+	sysheap = heap(0x200000,300); //start address, max blocks amount	
+
 	/*int *ptr3 = (int*)sysheap.__alloc(8);
 	int *ptr = (int*)sysheap.__aalloc(8,1024);
 	int *ptr2 = (int*)sysheap.__alloc(8);

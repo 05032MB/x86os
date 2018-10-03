@@ -68,7 +68,7 @@ class heap{
 	bool move_block_to_full(size_t num);
 	
 	bool divide_block(void*, size_t);
-	bool destroy_block();
+	bool destroy_block(size_t num, bool empty);
 	
 	public:
 	
@@ -89,6 +89,8 @@ class heap{
 void * kalloc(void* a,size_t size, bool align, addr_t);
 
 void init_heap(void);
+
+extern heap sysheap;
 
 extern void* endkernel; //from linkerscript, address of kernel ending
 extern void* begkernel; //from linkerscript, address of kernel beginning
