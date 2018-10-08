@@ -91,7 +91,7 @@ void init_paging_phase_2()
 {	
 
 	dword* page_table_2 = (dword*)init_pagedir_entry(&page_directory[1], 0xB);
-	init_frame(&page_table_2[0], 0x400000 , 0xB);
+	init_frame(&page_table_2[0], 0x400000 , 0xB); 
 
 
 }
