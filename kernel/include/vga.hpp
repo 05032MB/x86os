@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <types.hpp>
+#include <stdlib.h>
 
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
@@ -31,6 +32,10 @@ void term_putc(char c, uint8_t color);
 void term_putc(char c);
 void term_print(const char* str, uint8_t color);
 void term_print(const char* str);
+void term_print_num(int, unsigned);
+void term_print_dec(int);
+void term_print_hex(int);
+
 
 extern volatile uint16_t* vga_buffer;
 extern const int VGA_COLS ;

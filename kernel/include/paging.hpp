@@ -1,6 +1,7 @@
 #ifndef _PAGING_H
 #define _PAGING_H
 #include <types.hpp>
+#include <vga.hpp>
 #include <critical.hpp>
 #include <interrupts.hpp>
 #include <kmemory.hpp>
@@ -11,6 +12,7 @@
 #define ALIGNED_4MB __attribute__((aligned(4194304)))
 
 void init_paging();
+void init_paging_phase_2();
 
 //----------------------
 	/*Page table ebtry structure explained
@@ -26,7 +28,7 @@ void init_paging();
 	/*Page directory entry structure explained
 	-----------------------------------------------------------------------------------------------------------------------------------------------------------
     | 31-12|                                  |11...9		 |8			|7		   |6	|5		 |4	         |3			  |2		      |1		 |0	     |bits
-    |Address of frame (lower 12 bits set to 0)|Bits for me :)|Ignored   |PageSize  |0	|Accessed|DisablCache|WriteThrough|User/Supervisor|Read/Write|Present|function
+    |Address          (lower 12 bits set to 0)|Bits for me :)|Ignored   |PageSize  |0	|Accessed|DisablCache|WriteThrough|User/Supervisor|Read/Write|Present|function
 	-----------------------------------------------------------------------------------------------------------------------------------------------------------
 	set 7 to 1 to align 4MiB, otherwise it's 4KiB aligned
 	*/

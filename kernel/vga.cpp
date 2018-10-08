@@ -125,3 +125,17 @@ void term_print(const char* str, uint8_t color)
 	for (size_t i = 0; str[i] != '\0'; i ++) 
 		term_putc(str[i], color);
 }
+void term_print_num(int num, unsigned base)
+{
+	char dl[30];
+	itoa(num ,dl, base);
+	term_print(dl);
+}
+void term_print_dec(int num)
+{
+	term_print_num(num, 10);
+}
+void term_print_hex(int num)
+{
+	term_print_num(num, 16);
+}

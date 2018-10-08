@@ -230,7 +230,7 @@ void heap::__dealloc(void * ptr)
 					
 					merged = true;
 					
-					break;
+					z=0;
 				}
 			} 
 			

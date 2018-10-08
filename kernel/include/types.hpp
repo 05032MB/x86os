@@ -19,4 +19,8 @@ typedef dword addr_t;
 
 typedef long unsigned int size_t;
 
+#undef to_addr_t
+#define to_addr_t(x) (addr_t)x
+
+
 #endif //TYPES_H

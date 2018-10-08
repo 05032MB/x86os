@@ -3,6 +3,9 @@
 idtptr idtp;
 idtseg idt[INTTOP];
 
+isr_func_t int_handlers[INTTOP];
+
+
 __attribute__((used))
 static void dputs(int a)
 {
@@ -97,42 +100,40 @@ void slave_eoi()
 	ocw(MPIC1, EOI);
 }
 
+void register_interrupt_handler(word interrupt, isr_func_t fun)
+{
+	int_handlers[interrupt] = fun;
+}
+
 __attribute__((optimize("-O0")))
  void _c_int_handler(const int_iden ii) 
  {
-	//puts("mamy przerwanie");
-
+	
 	const char* msg[] = {
-	"DIVISION", "Debug", "NMI", "Breakpoint", "OVERFLOW", "BoundRangesExceeded",
-	"InvalidOpcode", "DNI", "DOUBLE FAULT !", "NiktJuzTegoNieUzywa", "Invalid TSS", "SegmentNotPresent", "StackSeg Fault",
-	"GP Fault", "Page fault", "IR1", "x86 FPE", "AlignChck", "MachineChck", "SIMD FPE", "VM Fault",
+	"#DE", "#DB", "NMI", "#BP", "#OF", "#BR",
+	"#UD", "#NM", "#DF", "CoprocessorSegmentOverrun", "#TS", "#NP", "#SS",
+	"#GP", "#PF", "IR1", "#MF", "#AC", "#MC", "#XM", "#VE",
 	"IR2", "IR3", "IR4", "IR5", "IR6", "IR7", "IR8", "IR9", "IR10",
-	"Security ", "IntelReserved11", "irq1", "irq2", "irq3", "irq4", "irq5", "irq6", "irq7", "irq8", "irq9", "irq10",
+	"#SX", "IR11", "irq1", "irq2", "irq3", "irq4", "irq5", "irq6", "irq7", "irq8", "irq9", "irq10",
 	"irq11", "irq12", "irq13", "irq15", "irq16", "irq17", "irq18",
 	};
 	
-	switch(ii.iden)
-	{
-		case 33:
-			//puts("Klawiatura");
-			break;
-		case 14:
-			page_fault_handler(ii);
-	
-	}
+
 	#ifdef __k_debug
 	dputs(ii.iden);
 	if(ii.iden < 48)puts(msg[ii.iden]);
-	int z =0;
-	if(ii.iden != 33){/*halt();*/while(z++ < 100000000)_nop();}
+	//int z =0;
+	//if(ii.iden != 33){/*halt();*/while(z++ < 100000000)_nop();}
 	#endif
+	
+	if(int_handlers[ii.iden])int_handlers[ii.iden](ii);
 	
 	if(ii.iden >= 0x20 && ii.iden < 0x28)master_eoi();
 	else if(ii.iden >= 0x28 && ii.iden < 0x2f /* 47 */){
 		slave_eoi();
 		master_eoi();
 	}
-	//halt();
+	
  }
 
  void init_interrupts()
@@ -140,5 +141,7 @@ __attribute__((optimize("-O0")))
 	init_pic(0x20, 0x28); //32, 40
 	init_idt_segs();	
 	idt_install();
+	
+	register_interrupt_handler(14, page_fault_handler);
 	
  }

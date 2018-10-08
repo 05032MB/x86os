@@ -74,6 +74,12 @@ dword iden, e_code; //isr
 extern idtptr idtp;
 extern idtseg idt[INTTOP];
 
+typedef void (*isr_func_t)(const int_iden);
+
+extern isr_func_t int_handlers[INTTOP];
+
+void register_interrupt_handler(word interrupt, isr_func_t fun);
+
 void init_interrupts();
 
 void idt_install();
