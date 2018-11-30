@@ -2,6 +2,7 @@
 
 gdtptr gdtp;
 gdtentry gdt[GDTMAX];
+tss_entry tss_main;
 
 #ifdef __k_debug
 #include <stdio.h>
@@ -41,17 +42,20 @@ void init_gdt_entry(gdtentry* ptr, dword base, dword limit, dword aflags)
 	ptr->limflags = (aflags >> 8)| limit2; 
 
 }
-sel_t get_segment_selector_GDT(short num, short priv)
+/*
+translates gdt entry index to segment selector
+*/
+sel_t get_segment_selector_GDT(short num, short privl)
 {
 
-	return (num << 3) | priv;
+	return (num << 3) | privl;
 
 }
 
-sel_t get_code_selector()
+/*sel_t get_code_selector() //gets kernel code selector
 {
 	return get_segment_selector_GDT(1,0);
-}
+}*/
 
 void init_gdt_entries()
 {
@@ -60,7 +64,8 @@ void init_gdt_entries()
 	init_gdt_entry(&gdt[2], 0, 0xFFFFFFFF, GDT_DATA_PL0); //0x10
 	init_gdt_entry(&gdt[3], 0, 0xFFFFFFFF, GDT_CODE_PL3); //0x1B
 	init_gdt_entry(&gdt[4], 0, 0xFFFFFFFF, GDT_DATA_PL0); //0x23
-	
+	//init_gdt_entry(&gdt[5], to_addr_t(&tss_main), sizeof(tss_main), SEG_GRAN(0) | SEG_CODE_EXA | SEG_PRIV(3) | SEG_PRES(0) ); //
+
 }
 
 void init_gdt()
@@ -68,6 +73,11 @@ void init_gdt()
 
 	init_gdt_entries();
 	gdt_install(GDTMAX);
-	_on_gdt_change(get_segment_selector_GDT(2,0), get_segment_selector_GDT(1,0));//data(ecx),ccode(edx)
+
+	//dputs( get_segment_selector_GDT(1,0));
+	_on_gdt_change(get_segment_selector_GDT(2,0), get_segment_selector_GDT(1,0));//data(ecx),ccode(edx)	
+	//halt();
+	_set_userspace_selectors(get_segment_selector_GDT(3,3), get_segment_selector_GDT(2,3));
+	
 	//dputs(KERNEL_CS);
 }

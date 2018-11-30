@@ -44,6 +44,7 @@ extern "C" void kernel_main()
 	term_print("Paging is ready\n");
 
 	init_heap();
+	term_print("Sysheap ready\n");
 	
 	init_paging_phase_2();
 	

@@ -87,11 +87,34 @@ void init_paging()
 	_write_cr0(0x80000000 | _get_cr0());
 }
 
+__attribute__((optimize("-O0")))
+static void poke_addr(addr_t addr)
+{
+	int* pointer = (int*)addr;
+	//dputs((unsigned int)pointer);
+	int bckp = *pointer;
+	*pointer = 5;
+	*pointer = bckp;
+
+}
+
 void init_paging_phase_2()
 {	
 
-	dword* page_table_2 = (dword*)init_pagedir_entry(&page_directory[1], 0xB);
-	init_frame(&page_table_2[0], 0x400000 , 0xB); 
-
+	/*dword* page_table_2 = (dword*)init_pagedir_entry(&page_directory[1], 0xB);
+	init_frame(&page_table_2[0], 0x400000 , 0xB); */
+	dword* page_table_2 = (dword*)init_pagedir_entry(&page_directory[1], 0xB);//krnl
+	for(int i =0; i<1024; i++)init_frame(&page_table_2[i], 0x400000 + i*4*1024 , 0xB); //[4MB;8MB), system memory
+	
+	dword* page_table_3 = (dword*)init_pagedir_entry(&page_directory[2], 0xF);//user
+	for(int i =0; i<1024; i++)init_frame(&page_table_3[i], 0xA00000 + i*4*1024 , 0xF); //[10MB;14MB), user memory
+	
+	/*poke_addr(0xA00001);//ok
+	poke_addr(0x400000);//ok
+	poke_addr(0x799999);
+	poke_addr(0x800001);//?
+	poke_addr(0xA00000-0x2);//?
+	//poke_addr(0xFFFFFFF);*/
+	
 
 }

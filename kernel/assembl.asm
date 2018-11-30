@@ -126,6 +126,14 @@ exp _lgdt:
 	lgdt [ecx]
 	ret
 
+exp _set_userspace_selectors:
+	;edx - code selector
+	;ecx - data selector
+	
+	mov [USER_CS], dx
+	mov [USER_DS], cx
+	
+	ret
 	
 exp _on_gdt_change:
 	;edx - code selector
@@ -141,13 +149,40 @@ exp _on_gdt_change:
 	mov [KERNEL_CS], dx
 	mov [KERNEL_DS], cx
 	
-	jmp 0x8:_returner ;far jump to update cs. 
+	;push _returner
+	;push dword [KERNEL_CS] ;;xD
+
+	;hlt
+	jmp 0x8:_returner
+	hlt ;somethings wrong
+	
+	;jmp 0x8:_returner ;far jump to update cs. 
 	;work on it! priority low
 	
 _returner:
 	ret
 ;;;;;;;;;;;;;;;;;;segEnd;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;userland&multitasking;;;;;;;;;;;;;;
+exp _tss_flush:
+	mov ax, cx
+	ltr ax
+	ret
+	
+exp switch_ring_3:
+	mov ax, [USER_DS]
+	mov dx, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	
+	mov eax, esp
+	push dword [USER_DS]
+	push eax
+	pushf
+	push dword [USER_CS]
+	iret
 
+;;;;;;;;;;;;;;;;;end;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;useful in mem managment
 ;;;write and read control registers cr0 , cr3
 ;;;setters must use __fastcall calling convention

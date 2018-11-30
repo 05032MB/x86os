@@ -43,7 +43,8 @@ OBJS:=$(AOBJS) $(COBJS)
 all: os.bin
 	 $(CXX) -T linker.ld -o os.bin -ffreestanding -O2 -nostdlib $(LINK_LIST) -lgcc
 
-os.bin: $(OBJS) crtn.oa crti.oa
+os.bin: $(LINK_LIST)
+#$(OBJS) crtn.oa crti.oa
 
 clean:
 	rm -f $(OBJS)

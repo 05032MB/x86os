@@ -5,6 +5,7 @@
 *.txt
 *.7z
 *.bin
+*.iso
 **/junk
 */compiler
 /lib/*.bat
