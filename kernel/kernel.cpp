@@ -54,6 +54,7 @@ extern "C" void kernel_main()
 	term_print("Boot completed\n");
 	term_print("----------------------\n",VGA_COLOR_MAGENTA);
 	
+	switch_to_ring_3();
 	
 	term_print("\nPress any key (3 to GP fault)\n");
 	while(1){

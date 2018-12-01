@@ -70,7 +70,7 @@ exp int_handler:
 	push gs
 	
 	push ax
-	mov ax, 0x10 ; kernel code selector
+	mov ax, [KERNEL_DS] ; kernel data selector
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
@@ -162,25 +162,34 @@ _returner:
 	ret
 ;;;;;;;;;;;;;;;;;;segEnd;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;userland&multitasking;;;;;;;;;;;;;;
+exp _get_esp:
+	mov eax, esp
+	ret
 exp _tss_flush:
 	mov ax, cx
 	ltr ax
 	ret
 	
-exp switch_ring_3:
-	mov ax, [USER_DS]
-	mov dx, ax
+exp switch_to_ring_3:
+	cli
+	mov ax, 0x23;[USER_DS]
+	mov ds, ax
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
-	
+	;hlt
 	mov eax, esp
 	push dword [USER_DS]
-	push eax
+	push dword eax
 	pushf
 	push dword [USER_CS]
+	push dword _lets_err
+	;hlt
 	iret
 
+_lets_err:
+	;cli
+	hlt
 ;;;;;;;;;;;;;;;;;end;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;useful in mem managment
 ;;;write and read control registers cr0 , cr3

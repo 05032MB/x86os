@@ -57,13 +57,14 @@ __attribute__((optimize("-O0"))) //otherwise some weird happens. Compile with di
 bool init_idt_segs()
 {
 	//word goodflag = 0x8E;
-	
-	for(int i =0; i<2; i++)init_idt_seg(&idt[i], (word) KERNEL_CS/*get_code_selector()*/,(byte) set_pr(0x1) | set_dpl(RING_0) | (INTERRUPT_TYPE_32) , _get_isr0_addr() +_get_isr_size()*i);
+	//dputs(KERNEL_CS);
+	for(int i =0; i<2; i++)init_idt_seg(&idt[i], (word) KERNEL_CS,(byte) set_pr(0x1) | set_dpl(RING_0) | (INTERRUPT_TYPE_32) , _get_isr0_addr() +_get_isr_size()*i);
 	for(int i =3; i<5; i++)init_idt_seg(&idt[i], (word) KERNEL_CS ,(byte) set_pr(0x1) | set_dpl(RING_0) | (TRAP_TYPE_32) , _get_isr0_addr() +_get_isr_size()*i);
 	for(int i =5; i<48; i++)init_idt_seg(&idt[i], (word) KERNEL_CS ,(byte) set_pr(0x1) | set_dpl(RING_0) | (INTERRUPT_TYPE_32) , _get_isr0_addr() +_get_isr_size()*i);
 	init_idt_seg(&idt[100], (word) 0x8 ,(byte) set_pr(0x1) | set_dpl(RING_0) | (INTERRUPT_TYPE_32) , _get_isr0_addr() +_get_isr_size()*100);
 	
 	init_idt_seg(&idt[48], (word) 0x3b ,(byte) set_pr(0x1) | set_dpl(RING_3) | (INTERRUPT_TYPE_32) , _get_isr0_addr() + _get_isr_size()*48); //reserved for syscalls
+	init_idt_seg(&idt[0x65], (word) KERNEL_CS ,(byte) set_pr(0x1) | set_dpl(RING_0) | (INTERRUPT_TYPE_32) , _get_isr0_addr() + _get_isr_size()*0x65); //system test interrupt
 
 	//init_idt_seg(&idt[14], (word)KERNEL_CS, set_pr(1) | set_dpl(RING_0) | INTERRUPT_TYPE_32, _get_isr0_addr() + _get_isr_size()*14);//pfault
 
@@ -76,6 +77,7 @@ bool init_idt_segs()
 
 bool init_idt_seg(idtseg* ptr, int selector, int flags, int pointer)
 {
+	//add memset
 	//if(num > INTTOP-1)return false;
 	word low = pointer & 0xffff;
 	word high = (pointer & 0xffff0000) >> 16;
@@ -122,8 +124,8 @@ __attribute__((optimize("-O0")))
 	#ifdef __k_debug
 	dputs(ii.iden);
 	if(ii.iden < 48)puts(msg[ii.iden]);
-	//int z =0;
-	//if(ii.iden != 33){/*halt();*/while(z++ < 100000000)_nop();}
+	int z =0;
+	if(ii.iden != 33){/*halt();*/while(z++ < 100000000)_nop();}
 	#endif
 	
 	if(int_handlers[ii.iden])int_handlers[ii.iden](ii);

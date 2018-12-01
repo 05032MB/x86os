@@ -29,6 +29,7 @@ void _cli();
 void _sti();
 void _nop();
 void init_idt();
+void switch_to_ring_3();
 }
 
 
