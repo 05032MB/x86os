@@ -64,7 +64,7 @@ void init_gdt_entries()
 	init_gdt_entry(&gdt[2], 0, 0xFFFFFFFF, GDT_DATA_PL0); //0x10
 	init_gdt_entry(&gdt[3], 0, 0xFFFFFFFF, GDT_CODE_PL3); //0x1B
 	init_gdt_entry(&gdt[4], 0, 0xFFFFFFFF, GDT_DATA_PL0); //0x23
-	//init_gdt_entry(&gdt[5], to_addr_t(&tss_main), sizeof(tss_main), SEG_GRAN(0) | SEG_CODE_EXA | SEG_PRIV(3) | SEG_PRES(0) ); //
+	init_gdt_entry(&gdt[5], to_addr_t(&tss_main), sizeof(tss_main), SEG_GRAN(0) | SEG_CODE_EXA | SEG_PRIV(3) | SEG_PRES(0) ); //
 
 }
 

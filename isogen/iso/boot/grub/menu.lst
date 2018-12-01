@@ -1,8 +1,8 @@
 default 0
-#timeout 30
+timeout 30
  
 #title Boot from hard disk
-#chainloader (hd0)+1
+chainloader (hd0)+1
  
 title Kernel
 kernel /boot/os.bin   

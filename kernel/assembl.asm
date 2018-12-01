@@ -149,15 +149,14 @@ exp _on_gdt_change:
 	mov [KERNEL_CS], dx
 	mov [KERNEL_DS], cx
 	
-	;push _returner
-	;push dword [KERNEL_CS] ;;xD
 
-	;hlt
-	jmp 0x8:_returner
+	push dword [KERNEL_CS];
+	push dword _returner;
+	retf ;far return
+	
 	hlt ;somethings wrong
 	
 	;jmp 0x8:_returner ;far jump to update cs. 
-	;work on it! priority low
 	
 _returner:
 	ret
