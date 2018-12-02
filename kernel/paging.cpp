@@ -28,11 +28,11 @@ static void populate_page_directory()
 
 static void init_primary_page_table()
 {
-	page_directory[0] = 2;//write enabled
+	page_directory[0] = 2 + 5;//write enabled
 	
-	for(int i = 0; i < PTSIZE; i++)page_table_primary[i] = (i * 0x1000) | 0xB; //supervisor, rw, present
+	for(int i = 0; i < PTSIZE; i++)page_table_primary[i] = (i * 0x1000) | 0xF;//0xB; //supervisor, rw, present
 	page_directory[0] |= ((dword)page_table_primary );
-	page_directory[0] |= 0xB;
+	page_directory[0] |= 0xF;//0xB;
 }
 void * translate_virtual_to_physical(void * virtualaddr)
 {
@@ -103,8 +103,8 @@ void init_paging_phase_2()
 
 	/*dword* page_table_2 = (dword*)init_pagedir_entry(&page_directory[1], 0xB);
 	init_frame(&page_table_2[0], 0x400000 , 0xB); */
-	dword* page_table_2 = (dword*)init_pagedir_entry(&page_directory[1], 0xB);//krnl
-	for(int i =0; i<1024; i++)init_frame(&page_table_2[i], 0x400000 + i*4*1024 , 0xB); //[4MB;8MB), system memory
+	dword* page_table_2 = (dword*)init_pagedir_entry(&page_directory[1], 0xF);//krnl
+	for(int i =0; i<1024; i++)init_frame(&page_table_2[i], 0x400000 + i*4*1024 , 0xF); //[4MB;8MB), system memory
 	
 	dword* page_table_3 = (dword*)init_pagedir_entry(&page_directory[2], 0xF);//user
 	for(int i =0; i<1024; i++)init_frame(&page_table_3[i], 0xA00000 + i*4*1024 , 0xF); //[10MB;14MB), user memory

@@ -28,9 +28,9 @@ enum vga_color {
 
 void term_clear(char bchar);
 void term_init();
-void term_putc(char c, uint8_t color);
+void term_putc(char c, byte color);
 void term_putc(char c);
-void term_print(const char* str, uint8_t color);
+void term_print(const char* str, byte color);
 void term_print(const char* str);
 void term_print_num(int, unsigned);
 void term_print_dec(int);
@@ -45,6 +45,6 @@ extern bool scrolling;
  
 extern int term_col;
 extern int term_row ;
-extern uint8_t term_color;
+extern byte term_color;
 
 #endif

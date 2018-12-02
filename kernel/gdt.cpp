@@ -20,7 +20,7 @@ void gdt_install(unsigned num)//num - number of entries
 {
 	gdtp.base = (dword)&gdt;
 	
-	gdtp.limit =( sizeof(struct gdtentry) * num )-1;
+	gdtp.limit =( sizeof(struct gdtentry) * num )-1; //<--!
 	
 	_lgdt((gdtptr*)&gdtp);
 
@@ -67,7 +67,7 @@ void init_gdt_entries()
 	init_gdt_entry(&gdt[4], 0, 0xFFFFFFFF, GDT_DATA_PL3); //0x23
 	init_gdt_entry(&gdt[5], to_addr_t(&tss_main),to_addr_t(&tss_main)+ sizeof(tss_main), (SEG_GRAN(0) | SEG_EX(1) |  SEG_PRIV(3) | SEG_PRES(1) | SEG_AC(1) | SEG_DESCTYPE(0))); //mandatory tss entry
 	
-	tss_main.esp0 = _get_esp();
+	tss_main.esp0 = _get_esp(); //fix
 	tss_main.ss0 = get_segment_selector_GDT(2,0);
 	
 	tss_main.cs   = get_segment_selector_GDT(1,3);
@@ -84,4 +84,5 @@ void init_gdt()
 	_set_userspace_selectors(get_segment_selector_GDT(4,3), get_segment_selector_GDT(3,3));
 	
 	_tss_flush(get_segment_selector_GDT(5,3));
+	//dputs(get_segment_selector_GDT(5,3));
 }

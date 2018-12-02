@@ -17,7 +17,7 @@
  
 #include <input.hpp>
 #include <vga.hpp>
-
+#include <syscalls.hpp>
 
 
 //Assembler functions
@@ -29,7 +29,8 @@ void _cli();
 void _sti();
 void _nop();
 void init_idt();
-void switch_to_ring_3();
+void _lets_err();
+void __attribute__((fastcall))switch_to_ring_3(void(*)());
 }
 
 

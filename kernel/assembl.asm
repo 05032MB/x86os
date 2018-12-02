@@ -43,18 +43,23 @@ exp _lidt:
 ;action: pushes element on stack
 ;in:  element(32bit)
 ;out: nope
-;C prototype: __attribute__((fastcall)) void _push(dword i);
+;C prototype: __attribute__((fastcall, optnone)) void _push(dword i);
 exp _push:
-	push dword ecx
+	pop eax
+	push ecx
+	push eax
 	ret
 ;name: _pop
 ;action: pops element from stack
 ;in:  no
 ;out: yes
-;C prototype: __attribute__((fastcall)) dword _pop(void);
+;C prototype: __attribute__((optnone)) dword _pop(void);
 exp _pop:
 	pop eax
+	add esp, 4
+	push eax
 	ret
+	
 ;;;;;;;;;;;;;;;;;;;;
 exp get_int_handler:
 	mov eax, int_handler
@@ -88,8 +93,8 @@ exp int_handler:
 	
 	popad	
 	
-	sti
 	add esp, 4*2 ;rem fake error code & iden. (2 * 32-bit regs (32/8=4bytes))
+	sti
 	iret
 
 
@@ -170,9 +175,9 @@ exp _tss_flush:
 	ltr ax
 	ret
 	
-exp switch_to_ring_3:
+exp switch_to_ring_3: ;fastcall, cx - function address
 	cli
-	mov ax, 0x23;[USER_DS]
+	mov ax, [USER_DS]
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
@@ -183,13 +188,27 @@ exp switch_to_ring_3:
 	push dword eax
 	pushf
 	push dword [USER_CS]
-	push dword _lets_err
+	push dword ecx
 	;hlt
 	iret
 
-_lets_err:
+exp _lets_err:
 	;cli
-	hlt
+	pushad
+	mov eax, 1
+	mov ebx, 'c'
+	mov ecx, 0xF
+	
+	int 80
+	
+	mov eax, 2
+	mov ebx, tsts
+	mov ecx, 0xF
+	
+	int 80
+	
+	popad
+	ret
 ;;;;;;;;;;;;;;;;;end;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;useful in mem managment
 ;;;write and read control registers cr0 , cr3
@@ -254,7 +273,7 @@ ISR_ERROR 8;Double Fault
 ISR_NOERROR 9;
 
 %assign i 10
-%rep 5
+%rep 5 
 	ISR_ERROR i
 	%assign i i+1
 %endrep
@@ -292,3 +311,8 @@ exp _get_isr0_addr:
 	ret;
 	
 ;;;;;;;;;;;;;;ISR END;;;;;;;;;;;;;;;
+
+section .data
+tsts db "SURTR\0"
+
+section .text

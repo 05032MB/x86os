@@ -48,13 +48,17 @@ extern "C" void kernel_main()
 	
 	init_paging_phase_2();
 	
+	init_syscalls();
+	term_print("System calls initialized\n");
+	
 	term_print("Hello, World!\n", VGA_COLOR_GREEN);
 	term_print("Welcome to the kernel.\n", VGA_COLOR_CYAN << 4);
 	
 	term_print("Boot completed\n");
 	term_print("----------------------\n",VGA_COLOR_MAGENTA);
 	
-	switch_to_ring_3();
+	switch_to_ring_3(_lets_err);
+	term_print("\nSuccessfully tested ring3");
 	
 	term_print("\nPress any key (3 to GP fault)\n");
 	while(1){

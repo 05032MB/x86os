@@ -91,6 +91,8 @@ extern gdtentry gdt[GDTMAX];
 
 extern word KERNEL_CS;
 extern word KERNEL_DS;
+extern word USER_DS;
+extern word USER_CS;
 
 //tss struct x86
 //nilX represents reserved bits which are set to 0

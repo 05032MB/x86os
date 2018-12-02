@@ -60,10 +60,10 @@ bool init_idt_segs()
 	//dputs(KERNEL_CS);
 	for(int i =0; i<2; i++)init_idt_seg(&idt[i], (word) KERNEL_CS,(byte) set_pr(0x1) | set_dpl(RING_0) | (INTERRUPT_TYPE_32) , _get_isr0_addr() +_get_isr_size()*i);
 	for(int i =3; i<5; i++)init_idt_seg(&idt[i], (word) KERNEL_CS ,(byte) set_pr(0x1) | set_dpl(RING_0) | (TRAP_TYPE_32) , _get_isr0_addr() +_get_isr_size()*i);
-	for(int i =5; i<48; i++)init_idt_seg(&idt[i], (word) KERNEL_CS ,(byte) set_pr(0x1) | set_dpl(RING_0) | (INTERRUPT_TYPE_32) , _get_isr0_addr() +_get_isr_size()*i);
+	for(int i =5; i<49; i++)init_idt_seg(&idt[i], (word) KERNEL_CS ,(byte) set_pr(0x1) | set_dpl(RING_0) | (INTERRUPT_TYPE_32) , _get_isr0_addr() +_get_isr_size()*i);
 	init_idt_seg(&idt[100], (word) 0x8 ,(byte) set_pr(0x1) | set_dpl(RING_0) | (INTERRUPT_TYPE_32) , _get_isr0_addr() +_get_isr_size()*100);
 	
-	init_idt_seg(&idt[48], (word) 0x3b ,(byte) set_pr(0x1) | set_dpl(RING_3) | (INTERRUPT_TYPE_32) , _get_isr0_addr() + _get_isr_size()*48); //reserved for syscalls
+	init_idt_seg(&idt[80], (word) KERNEL_CS ,(byte) set_pr(0x1) | set_dpl(RING_3) | (INTERRUPT_TYPE_32) , _get_isr0_addr() + _get_isr_size()*80); //reserved for syscalls
 	init_idt_seg(&idt[0x65], (word) KERNEL_CS ,(byte) set_pr(0x1) | set_dpl(RING_0) | (INTERRUPT_TYPE_32) , _get_isr0_addr() + _get_isr_size()*0x65); //system test interrupt
 
 	//init_idt_seg(&idt[14], (word)KERNEL_CS, set_pr(1) | set_dpl(RING_0) | INTERRUPT_TYPE_32, _get_isr0_addr() + _get_isr_size()*14);//pfault
@@ -119,15 +119,16 @@ __attribute__((optimize("-O0")))
 	"#SX", "IR11", "irq1", "irq2", "irq3", "irq4", "irq5", "irq6", "irq7", "irq8", "irq9", "irq10",
 	"irq11", "irq12", "irq13", "irq15", "irq16", "irq17", "irq18",
 	};
-	
+	msg[80]="SYSCALL";
 
 	#ifdef __k_debug
-	dputs(ii.iden);
-	if(ii.iden < 48)puts(msg[ii.iden]);
+	//dputs(ii.iden);
+	if(ii.iden <= 48 || ii.iden == 80)puts(msg[ii.iden]);
 	int z =0;
-	if(ii.iden != 33){/*halt();*/while(z++ < 100000000)_nop();}
+	//if(ii.iden != 33){/*halt();*/while(z++ < 100000000)_nop();}
 	#endif
 	
+	//dputs((int)int_handlers[ii.iden]);
 	if(int_handlers[ii.iden])int_handlers[ii.iden](ii);
 	
 	if(ii.iden >= 0x20 && ii.iden < 0x28)master_eoi();

@@ -49,8 +49,6 @@ struct idtptr {
 } __attribute__ ((packed));
 
 extern "C" __attribute__((fastcall)) void _lidt(idtptr* i); //AKA dword i (only address matters really)
-extern "C" __attribute__((fastcall)) void _push(dword i);
-extern "C" __attribute__((fastcall)) dword _pop();
 
 struct idtseg{
 	word offset1; //0-15 bit(low)

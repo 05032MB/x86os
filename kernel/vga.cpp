@@ -11,7 +11,7 @@ bool scrolling = 1; //do we want to "scroll?"
 // We start displaying text in the top-left of the screen (column = 0, row = 0)
 int term_col = 0;
 int term_row = 0;
-uint8_t term_color = 0x0F; // Black background, White foreground
+byte term_color = 0x0F; // Black background, White foreground
  
 class terminal{
 
@@ -120,7 +120,7 @@ void term_print(const char* str)
 {
 	term_print(str, term_color);
 }
-void term_print(const char* str, uint8_t color)
+void term_print(const char* str, byte color)
 {
 	for (size_t i = 0; str[i] != '\0'; i ++) 
 		term_putc(str[i], color);
