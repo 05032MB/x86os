@@ -1,5 +1,8 @@
 ﻿#include <_kmaster.hpp>
 
+#include <multiboot.hpp>
+#include <vfs.hpp>
+#include <bfs.hpp>
  
 // First, let's do some basic checks to make sure we are using our x86-elf cross-compiler correctly
 #if defined(__linux__)
@@ -31,13 +34,16 @@
 
 #include <stdlib.h>
 
-extern "C" void kernel_main()
+extern "C" void kernel_main(multiboot_info_t *mbinfo)
 {
 	term_init();
 	term_print("VGA display ready\n");
-
+	
+	term_print("Found GRUB modules: ");
+	term_print_dec(mbinfo->mods_count);
+	
 	init_gdt();
-	term_print("Memory segmented\n");
+	term_print("\nMemory segmented\n");
 	init_interrupts(); //add support for APIC if available
 	term_print("Interrupts are configured\n");
 	init_paging();
@@ -51,6 +57,11 @@ extern "C" void kernel_main()
 	init_syscalls();
 	term_print("System calls initialized\n");
 	
+	init_vfs();
+	term_print("VFS initialized\n");
+	
+	first_fs = init_initrd(1500);
+	
 	term_print("Hello, World!\n", VGA_COLOR_GREEN);
 	term_print("Welcome to the kernel.\n", VGA_COLOR_CYAN << 4);
 	
@@ -58,6 +69,7 @@ extern "C" void kernel_main()
 	term_print("----------------------\n",VGA_COLOR_MAGENTA);
 	
 	switch_to_ring_3(_lets_err);
+	//switch_to_ring_0();
 	term_print("\nSuccessfully tested ring3");
 	
 	term_print("\nPress any key (3 to GP fault)\n");

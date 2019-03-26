@@ -32,7 +32,9 @@ section .text
 exp _entry:
 
 	mov esp, stack_top
- 
+ 	
+	push ebx ;get multiboot info struct
+
 	calle kernel_main
  
 	cli
