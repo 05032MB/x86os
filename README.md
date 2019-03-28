@@ -1,7 +1,8 @@
 # x86os
-x86 operating system
 
-Things that work(partially):
+x86 operating system.
+
+Things that work (partially):
 
  - Interrupts
  - Paging (nope)
@@ -16,27 +17,64 @@ Things to do in near future:
 
 
 ----------
-## How to build ##
 
-1. Build GCC ELF cross-compiler
+## Install dependencies
 
-2. Install NASM
+1. Build GNU GCC i686-elf cross-compiler or get precompiled binaries (e.g. from [here](https://github.com/lordmilko/i686-elf-tools)).
 
-3. Add to PATH:
+2. Install GNU Make.
 
- - cross-compiler's binaries
- - NASM executable
+3. Install NASM ([official website](https://www.nasm.us/)).
 
-3. Open command prompt in lib folder and type
+4. Install emulator of your choice (e.g [QEMU](https://www.qemu.org/)).
 
->  make install
+5. Add binaries to `PATH`:
 
-4. Open command prompt in kernel folder and type 
+   - cross-compiler's binaries
+   - Make binaries
+   - NASM binaries
+   - QEMU binaries
 
-> make all
+## Check dependencies
 
-5. Launch in emulator e.g [QEMU](https://www.qemu.org/).
+Try following commands:
 
-## Resources ##
-- [OsdevWiki](https://www.wiki.osdev.org)
-- [Executable and Linkable Format] (http://www.cs.cmu.edu/afs/cs/academic/class/15213-s00/doc/elf.pdf)
+```bat
+i686-elf-g++ --version
+make --version
+nasm --version
+qemu-system-i386 --version
+```
+
+(Each tool should print short info about its version.)
+
+## Build and launch x86os
+
+1. Open command prompt.
+
+2. Navigate to `lib` folder and type:
+
+   ```bat
+   make install
+   ```
+
+3. Navigate to  `kernel` folder and type:
+
+   ```bat
+   make all
+   deploy.bat
+   ```
+
+3. Navigate to `isogen` folder and type:
+
+   ```bat
+   qemu_launch.bat
+   ```
+
+## Dive into code!
+
+**Hint:** C++ entry point is `kernel_main`.
+
+## Resources
+- [OSDev Wiki](https://wiki.osdev.org/Expanded_Main_Page)
+- [Executable and Linkable Format](http://www.cs.cmu.edu/afs/cs/academic/class/15213-s00/doc/elf.pdf)

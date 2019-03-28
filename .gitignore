@@ -4,7 +4,6 @@
 *.docx
 *.txt
 *.7z
-*.zip
 *.bin
 *.iso
 *.exe
@@ -12,3 +11,4 @@
 */compiler
 /lib/*.bat
 /compiler
+*.ipch
