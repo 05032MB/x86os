@@ -1,5 +1,7 @@
 #include <gdt.hpp>
 
+#include <string.h>	
+
 gdtptr gdtp;
 gdtentry gdt[GDTMAX];
 tss_entry tss_main;
@@ -67,7 +69,7 @@ void init_gdt_entries()
 	init_gdt_entry(&gdt[4], 0, 0xFFFFFFFF, GDT_DATA_PL3); //0x23
 	init_gdt_entry(&gdt[5], to_addr_t(&tss_main),to_addr_t(&tss_main)+ sizeof(tss_main), (SEG_GRAN(0) | SEG_EX(1) |  SEG_PRIV(3) | SEG_PRES(1) | SEG_AC(1) | SEG_DESCTYPE(0))); //mandatory tss entry
 	
-	tss_main.esp0 = _get_esp(); //fix
+	tss_main.esp0 = _get_esp(); //fix it !!!! !!!!
 	tss_main.ss0 = get_segment_selector_GDT(2,0);
 	
 	tss_main.cs   = get_segment_selector_GDT(1,3);
@@ -76,7 +78,7 @@ void init_gdt_entries()
 
 void init_gdt()
 {
-
+	memset(gdt, 0, sizeof(gdt[0])*GDTMAX);
 	init_gdt_entries();
 	gdt_install(GDTMAX);
 

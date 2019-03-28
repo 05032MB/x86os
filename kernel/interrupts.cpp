@@ -48,7 +48,7 @@ void idt_install()
     idtp.limit = (sizeof (struct idtseg) * INTTOP) - 1;//limit = rozmiar - 1
     idtp.base = (dword) &idt;
 	
-    //memset(&idt, 0, sizeof(idt[0])*INTTOP); //memset(&idt, 0, 8*256);
+    //memset(idt, 0, sizeof(idt[0])*INTTOP-1); //memset(&idt, 0, 8*256);
 
     _lidt((idtptr*)&idtp);
 }
@@ -141,6 +141,9 @@ __attribute__((optimize("-O0")))
 
  void init_interrupts()
  {
+ 
+	memset(idt, 0, sizeof(idt[0])*INTTOP);
+ 
 	init_pic(0x20, 0x28); //32, 40
 	init_idt_segs();	
 	idt_install();

@@ -40,7 +40,17 @@ void init_paging_phase_2();
 #define ENTR_RW(x) x<<1
 #define ENTR_PRESENT(x) x
 //----------------
+using page_t = dword;
 
+struct page_table_t{
+	page_t pages[1024];
+};
+
+struct page_dir_t{
+	page_table_t *tables[1024];
+	addr_t physAddr[1024]; //physical address for tables
+	addr_t selfPhys; //physical address for self
+};
 
 //---------------
 extern ALIGNED_4kB dword page_directory[PTSIZE];
@@ -49,6 +59,7 @@ extern ALIGNED_4kB dword page_table_primary[PTSIZE];
 bool set_page_dir(dword);
 
 void page_fault_handler(const int_iden ii);
+
 
 //assembly functions
 extern "C"{

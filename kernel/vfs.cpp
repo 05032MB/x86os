@@ -2,7 +2,7 @@
 #include <kmemory.hpp>
 #include <critical.hpp>
 
-pre_f_node *first_fs = nullptr;
+f_node *first_fs = nullptr;
 
 size_t fs_read(f_node* node,addr_t adr,size_t size,byte* off)
 {

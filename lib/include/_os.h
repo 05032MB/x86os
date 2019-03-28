@@ -27,5 +27,8 @@ void term_print(const char* str, uint8_t color);
 
 #endif
 
+#ifdef __cplusplus
+	int test_cpp_lib(int a);
+#endif
 
 #endif

@@ -35,7 +35,7 @@ SOURCES:=$(CSOURCES) $(ASOURCES)
 
 OBJS:=$(AOBJS) $(COBJS)
 	
-.PHONY: all clean install
+.PHONY: all clean rebuild list
 
 
 all: os.bin
@@ -54,7 +54,11 @@ $(DEST)/%.oa : %.asm
 	$(ASM) -felf32 $< -o $@
 $(DEST)/%.oa : %.spec
 	$(ASM) -felf32 $< -o $@
-	
+
+rebuild: clean all
+
+list: sources targets
+
 sources:
 	echo $(SOURCES)
 targets:

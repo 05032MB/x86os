@@ -65,6 +65,7 @@ typedef word sel_t; //segment selector type
 
 void init_gdt();
 
+void init_gdt_entries();
 //////////
 struct gdtptr{
 	word limit;
@@ -82,8 +83,10 @@ struct gdtentry{
 }__attribute__((packed));
 
 void gdt_install();
-void init_gdt_entries();
+
 void init_gdt_entry(gdtentry* ptr,dword base, dword limit, dword aflags);
+
+
 sel_t get_segment_selector_GDT(short num, short priv);
 
 extern gdtptr gdtp;

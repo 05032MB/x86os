@@ -19,12 +19,11 @@ syscalls are not to utilize stack to pass parameters
 
 #define SYSCALL_MAX 10
 
-extern void* syscalls[SYSCALL_MAX];
+//extern void* syscalls[SYSCALL_MAX];
 
 void init_syscalls();
 
 bool register_syscall(int, void*);
-
 void syscall_handler(const int_iden);
 
 extern "C"{

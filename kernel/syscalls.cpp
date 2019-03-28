@@ -16,6 +16,7 @@ void init_syscalls()
 	
 	register_syscall(1,  (void*)static_cast<void (*) (char, byte)>(&term_putc));
 	register_syscall(2,  (void*)static_cast<void (*) (const char*, byte)>(&term_print));
+	register_syscall(3,  (void*)static_cast<void (*) (int)>(&term_print_hex));
 }
 
 

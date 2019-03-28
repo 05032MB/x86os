@@ -22,5 +22,11 @@ typedef long unsigned int size_t;
 #undef to_addr_t
 #define to_addr_t(x) (addr_t)x
 
+#define __packed __attribute__((packed)) 
+#define __nooptimize __attribute__((optimize("-O0")))
+#define __maxoptimize __attribute__((optimize("-O3")))
+#define __nonreturn __attribute__((nonreturn))
+#define __fastcall __attribute__((fastcall))
+
 
 #endif //TYPES_H

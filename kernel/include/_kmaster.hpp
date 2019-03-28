@@ -31,6 +31,7 @@ void _nop();
 void init_idt();
 void _lets_err();
 void __attribute__((fastcall))switch_to_ring_3(void(*)());
+void __attribute__((fastcall))switch_to_ring_0();
 }
 
 

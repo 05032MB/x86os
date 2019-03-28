@@ -94,6 +94,11 @@ void init_heap(void);
 
 extern heap sysheap;
 
+#define __ALLOC(s) sysheap.__alloc(s) //alloc macro
+#define __SALLOC(obj) __ALLOC(sizeof(obj))	//simple alloc macro
+#define __SCALLOC(obj, obj2) reinterpret_cast<obj2>(__SALLOC(obj))//simple casting allocation
+#define _SCALLOC(obj) reinterpret_cast<obj*>(__SALLOC(obj))//even simpler casting allocation (so only one underscore)
+
 extern void* endkernel; //from linkerscript, address of kernel ending
 extern void* begkernel; //from linkerscript, address of kernel beginning
 extern void* prekernel; //0,propably

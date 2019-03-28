@@ -1,4 +1,4 @@
 make
-copy /B "os.bin" "../isogen/iso/boot" /Y
-cd ../isogen
+copy /B "os.bin" "../utility/isogen/iso/boot" /Y
+cd ../utility/isogen
 buildiso.bat

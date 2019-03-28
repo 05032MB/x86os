@@ -3,29 +3,23 @@ DEST=dest/
 KERNDIR=../kernel
 
 CC:=i686-elf-g++
-CXX:=i686-elf-g++
 AR:=i686-elf-ar
 
 CFLAGS:=$(CFLAGS) -ffreestanding -Wall -Wextra
-CPPFLAGS:=$(CPPFLAGS) -Iinclude -I$(KERNDIR)/include -D__is_libk -ffreestanding
+CPPFLAGS:=$(CPPFLAGS) -Iinclude -I$(KERNDIR)/include -D__is_libk
 
 LIBK_CFLAGS:=$(CFLAGS)
 LIBK_CPPFLAGS:= -D__is_libk $(CPPFLAGS)
 
-SOURCES1=\
-$(wildcard $(SRC)/*.c) 
+SOURCES=\
+$(wildcard $(SRC)/*.c)
 
-SOURCES2=\
-$(wildcard $(SRC)/*.cpp)
+LIBOBJS=\
+$(SOURCES:.c=.o)
+#$(patsubst $(SRC)/*.c, $(DEST)/*.o, $(SOURCES))
+#
 
-LIBOBJS1=\
-$(SOURCES1:.c=.o)
-LIBOBJS2=\
-$(SOURCES2:.cpp=.o)
-
-LIBOBJS = $(LIBOBJS1) $(LIBOBJS2)
-
-.PHONY: all clean install rebuild
+.PHONY: all clean install
 
 install: libk.a
 
@@ -38,16 +32,11 @@ clean:
 	rm -f $(LIBOBJS)
 	rm -f libk.a
 	
-rebuild: clean all
-
 %.o : %.c %.h
 	$(CC) -c  $< -o $@ $(LIBK_CFLAGS) $(LIBK_CPPFLAGS)
 
-%.o : %.cpp %.h
-	$(CXX) -c  $< -o $@ $(LIBK_CFLAGS) $(LIBK_CPPFLAGS)
-
 sources:
-	echo $(SOURCES1) $(SOURCES2)
+	echo $(SOURCES)
 targets:
 	echo $(LIBOBJS)
 #$(LIBOBJS): $(SOURCES)

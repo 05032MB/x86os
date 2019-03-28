@@ -207,6 +207,17 @@ exp _lets_err:
 	
 	int 80
 	
+	mov eax, 2
+	mov ebx, string111
+	mov ecx, 0xF
+	
+	int 80
+	
+	mov eax, 3
+	mov ebx, 0x11
+	
+	int 80
+	
 	popad
 	ret
 ;;;;;;;;;;;;;;;;;end;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -314,5 +325,6 @@ exp _get_isr0_addr:
 
 section .data
 tsts db "SURTR\0"
+string111 db "Printing number in hex\n"
 
 section .text

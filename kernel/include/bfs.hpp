@@ -3,37 +3,46 @@
 
 #include <types.hpp>
 
+//simple filesystem
+//used to create ramdisk-like structure on system boot
+//assumes contiguous memory allocation
+
+
 struct bfs_superblock{
 	dword magic;
 	dword start;
 	dword size;
+	dword inodesmax; //max number of inodes
 	dword sanity[4];
 
-}__attribute__((packed));
-
-extern bfs_superblock BFSsuperblock;
+}__packed;
 
 struct bfs_inode{
-	dword inumber;
-	dword block_first;
-	dword block_last;
-	dword eof_offset;
-	dword attributes;
-	dword file_mode;
-	dword uid;
+	//byte name[64];
+	dword inode;
+	dword block_pointer; //pointer to data block of the file
+	dword eof_offset; //size
+	dword attributes; //type of node
+	dword file_mode; //mask of permissions
+	dword oid;
 	dword gid;
 	dword nlinks;
-	dword atime;
-	dword mtime;
 	dword ctime;
-	dword spare[4];
+	
+	//dword nextnode;
 
-}__attribute__((packed));
+}__packed;
 
-struct bfs_block{
+struct bfs_dirblock{ 
 	word inode;
-	byte name[14];
+	byte name[64];
 
-}__attribute__((packed));
+}__packed;
+
+using initrd_virtual_node = struct f_node;
+
+initrd_virtual_node * init_initrd(addr_t loc);
+
+//extern initrd_virtual_node * initrd_nodes;
 
 #endif

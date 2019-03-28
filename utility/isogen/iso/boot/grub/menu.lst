@@ -6,3 +6,4 @@ chainloader (hd0)+1
  
 title Kernel
 kernel /boot/os.bin   
+module /boot/initramdisk

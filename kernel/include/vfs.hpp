@@ -27,7 +27,7 @@ struct pre_f_node{
 
 enum  f_type {FILE=1, DIRECTORY=2, MOUNTPOINT=4, DEVICE=8};
 
-struct f_node : public pre_f_node{
+struct f_node{
 
 	//char name[64]; //file name
 	dword oid{0}; //owner id
@@ -37,7 +37,7 @@ struct f_node : public pre_f_node{
 	
 	dword flags;
 	
-	//dword inode;
+	dword inode;
 	
 	f_callbacks_pack callback; //callbacks to low-level drivers
 	
@@ -45,20 +45,20 @@ struct f_node : public pre_f_node{
 
 }__packed;
 
-struct d_node : public pre_f_node{
-	//char name[64];
-	//dword inode;
+struct d_node {
+	char name[64];
+	dword inode;
 
 }__packed;
 
-extern pre_f_node *first_fs;
+extern f_node *first_fs;
 
 size_t fs_read(struct f_node*,addr_t,size_t,byte*);
 size_t fs_write(struct f_node*,addr_t,size_t,byte*);
 unsigned fs_open(struct f_node*);
 unsigned fs_close(struct f_node*);
-struct d_node * fs_readdir_type_t(struct f_node*,dword);
-struct f_node * fs_findindir_type_t(struct f_node*,char *name);
+struct d_node * fs_readdir(struct f_node*,dword);
+struct f_node * fs_findindir(struct f_node*,char*);
 
 
 void init_vfs();

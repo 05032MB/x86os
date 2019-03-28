@@ -42,6 +42,32 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 	term_print("Found GRUB modules: ");
 	term_print_dec(mbinfo->mods_count);
 	
+	unsigned short modsnum  = mbinfo->mods_count; 
+	
+	dword trav_helper = mbinfo->mods_addr;
+	
+	for(decltype(modsnum) i = 0; i < modsnum; i++){ //counts grub modules
+	
+		dword modbeg = *reinterpret_cast<dword*>(trav_helper) ;
+		dword modend = *reinterpret_cast<dword*>(trav_helper+4);
+		
+		endkernel = reinterpret_cast<void*>(modend);
+		
+		term_print("\n->Module: ");
+		term_print_dec(modsnum);
+		term_print(",beg=");
+		term_print_dec(modbeg);
+		term_print(",end=");
+		term_print_dec(modend);
+		term_print(",name=");
+		term_print(reinterpret_cast<const char*>(trav_helper+8));
+		term_print(",found and taken into account");
+		
+		trav_helper += 12;
+   
+	}
+	
+	
 	init_gdt();
 	term_print("\nMemory segmented\n");
 	init_interrupts(); //add support for APIC if available
@@ -60,7 +86,16 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 	init_vfs();
 	term_print("VFS initialized\n");
 	
-	first_fs = init_initrd(1500);
+	first_fs = init_initrd(*reinterpret_cast<dword*>(mbinfo->mods_addr));
+	term_print("Ramdisk ready\n");
+	
+	
+	f_node* noder = fs_findindir(first_fs , static_cast<char*>("Kat002") );  //działa
+	//term_print("\n");
+	//term_print_dec((dword)noder); 
+	//term_print("\n");
+	//term_print(noder->oid); term_print(":");
+	//term_print_dec(noder->inode);
 	
 	term_print("Hello, World!\n", VGA_COLOR_GREEN);
 	term_print("Welcome to the kernel.\n", VGA_COLOR_CYAN << 4);
