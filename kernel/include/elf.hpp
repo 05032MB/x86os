@@ -16,22 +16,22 @@ namespace ELF{
 
 struct ELF32_Header{
 
-	dword	e_ident[EI_NIDENT];
-	ELF32_Half	e_type;
-	ELF32_Half	e_machine;
-	ELF32_Word	e_version;
-	ELF32_Addr	e_entry;
-	ELF32_Off	e_phoff;
-	ELF32_Off	e_shoff;
-	ELF32_Word	e_flags;
-	ELF32_Half	e_ehsize;
-	ELF32_Half	e_phentsize;
-	ELF32_Half	e_phnum;
-	ELF32_Half	e_shentsize;
-	ELF32_Half	e_shnum;
-	ELF32_Half	e_shstrndx;
+	byte	e_ident[EI_NIDENT]; //way to identify elf file type (see ELF_Ident)
+	ELF32_Half	e_type; //what we are dealing with (see ELF_Type)
+	ELF32_Half	e_machine; //target machine. See(ELF_Machine). We are expecting EM_386 (0x3).
+	ELF32_Word	e_version; //version of ELF standard. Should be 1.
+	ELF32_Addr	e_entry; //Address of entry point of executable.
+	ELF32_Off	e_phoff; //Offset to program header table.
+	ELF32_Off	e_shoff; //Offset to first section header table.
+	ELF32_Word	e_flags; //ELF Machine Flags (don't confuse with ELF_Machine enum). For IA-32 is always 0. 
+	ELF32_Half	e_ehsize; //Header's own size (bytes).
+	ELF32_Half	e_phentsize; //Size of one entry in program header table. All others are same size.
+	ELF32_Half	e_phnum; //Number of entries in pht.
+	ELF32_Half	e_shentsize; //Size of section header (bytes)
+	ELF32_Half	e_shnum; //Number of section headers.
+	ELF32_Half	e_shstrndx; //Index of section header table where we can find string table (special kind of section table).
 
-}__attribute__((packed));
+}__packed;
 
 enum ELF_Type { //e_type
 	ET_NONE		= 0, // No Type
@@ -97,19 +97,19 @@ enum ELF_Data{
 //////////////////////////////////////////////////////////////////////
 
 struct ELF32_SecHeader{
-	ELF32_Word	sh_name;
-	ELF32_Word	sh_type;
-	ELF32_Word	sh_flags;
-	ELF32_Addr	sh_addr;
-	ELF32_Off	sh_offset;
-	ELF32_Word	sh_size;
-	ELF32_Word	sh_link;
-	ELF32_Word	sh_info;
-	ELF32_Word	sh_addralign;
-	ELF32_Word	sh_entsize;
-}__attribute__((packed));
+	ELF32_Word	sh_name; //section name
+	ELF32_Word	sh_type; //section type. See Sec_Types.
+	ELF32_Word	sh_flags; //flags. See Sec_Flags
+	ELF32_Addr	sh_addr; //Address where to load section
+	ELF32_Off	sh_offset; //Offset from the beginning of file to the start of the section
+	ELF32_Word	sh_size; //Size of section (bytes).
+	ELF32_Word	sh_link; //nwm
+	ELF32_Word	sh_info; //look below
+	ELF32_Word	sh_addralign; //0/1 no alignment. Otherwise align it when loading.
+	ELF32_Word	sh_entsize; //Size of each entry in special sections (eg symbol table section). Otherwise 0.
+}__packed;
 
-enum Sec_Types {
+enum Sec_Types {	//guess
 	SHT_NULL	= 0,   
 	SHT_PROGBITS= 1,  
 	SHT_SYMTAB	= 2,
@@ -130,6 +130,29 @@ enum Sec_Flags{
 };
 
 #define SHN_UNDEF 0 //xD
+
+//////////////////////////////////////////////
+
+struct ELF32_ProgHeader{
+	ELF32_Word p_type;
+	ELF32_Off p_offset;
+	ELF32_Addr p_vaddr;
+	ELF32_Addr p_paddr;
+	ELF32_Word p_filesz;
+	ELF32_Word p_memsz;
+	ELF32_Word p_flags;
+	ELF32_Word p_align;
+}__packed;
+
+enum Prog_Types{
+	PT_NULL = 0,
+	PT_LOAD,
+	PT_DYNAMIC,
+	PT_INTERP,
+	PT_NOTE,
+	PT_SHLIB,
+	PT_PHDR,
+};
 
 void* load_elf(ELF32_Header*);
 bool check_elf_header(ELF32_Header*);

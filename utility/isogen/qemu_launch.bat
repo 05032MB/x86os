@@ -1,1 +1,1 @@
-qemu-system-i386 -cdrom bootable.iso
+qemu-system-i386 -m 256M -cdrom bootable.iso 2> qemu_error.log.txt

@@ -3,6 +3,7 @@
 #include <multiboot.hpp>
 #include <vfs.hpp>
 #include <bfs.hpp>
+#include <elf.hpp>
  
 // First, let's do some basic checks to make sure we are using our x86-elf cross-compiler correctly
 #if defined(__linux__)
@@ -54,7 +55,7 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 		endkernel = reinterpret_cast<void*>(modend);
 		
 		term_print("\n->Module: ");
-		term_print_dec(modsnum);
+		term_print_dec(i);
 		term_print(",beg=");
 		term_print_dec(modbeg);
 		term_print(",end=");
@@ -63,7 +64,7 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 		term_print(reinterpret_cast<const char*>(trav_helper+8));
 		term_print(",found and taken into account");
 		
-		trav_helper += 12;
+		trav_helper += 16;
    
 	}
 	
@@ -96,14 +97,15 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 	//term_print("\n");
 	//term_print(noder->oid); term_print(":");
 	//term_print_dec(noder->inode);
-	
+	auto btstrp = ELF::load_elf(reinterpret_cast< ELF::ELF32_Header* >( *reinterpret_cast<dword*> (  mbinfo->mods_addr +16  ) ) );
+
 	term_print("Hello, World!\n", VGA_COLOR_GREEN);
 	term_print("Welcome to the kernel.\n", VGA_COLOR_CYAN << 4);
 	
 	term_print("Boot completed\n");
 	term_print("----------------------\n",VGA_COLOR_MAGENTA);
 	
-	switch_to_ring_3(_lets_err);
+	switch_to_ring_3((void(*)())btstrp/*_lets_err*/);
 	//switch_to_ring_0();
 	term_print("\nSuccessfully tested ring3");
 	
