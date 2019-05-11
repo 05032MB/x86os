@@ -54,15 +54,15 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 		
 		endkernel = reinterpret_cast<void*>(modend);
 		
-		term_print("\n->Module: ");
-		term_print_dec(i);
-		term_print(",beg=");
-		term_print_dec(modbeg);
-		term_print(",end=");
-		term_print_dec(modend);
-		term_print(",name=");
-		term_print(reinterpret_cast<const char*>(trav_helper+8));
-		term_print(",found and taken into account");
+		term_print("\n->Module: ",VGA_COLOR_LIGHT_GREY );
+		term_print_dec(i,VGA_COLOR_LIGHT_GREY );
+		term_print(",beg=",VGA_COLOR_LIGHT_GREY );
+		term_print_dec(modbeg,VGA_COLOR_LIGHT_GREY );
+		term_print(",end=",VGA_COLOR_LIGHT_GREY );
+		term_print_dec(modend,VGA_COLOR_LIGHT_GREY );
+		term_print(",name=",VGA_COLOR_LIGHT_GREY );
+		term_print(reinterpret_cast<const char*>(trav_helper+8),VGA_COLOR_LIGHT_GREY );
+		term_print(",found and taken into account",VGA_COLOR_LIGHT_GREY );
 		
 		trav_helper += 16;
    

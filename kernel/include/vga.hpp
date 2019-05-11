@@ -33,7 +33,9 @@ void term_putc(char c);
 void term_print(const char* str, byte color);
 void term_print(const char* str);
 void term_print_num(int, unsigned);
+void term_print_num(int, unsigned, byte);
 void term_print_dec(int);
+void term_print_dec(int, byte);
 void term_print_hex(int);
 
 

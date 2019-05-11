@@ -1,4 +1,5 @@
 #include <syscalls.hpp>
+#include <input.hpp>
 
  void* syscalls[SYSCALL_MAX];
  
@@ -17,6 +18,7 @@ void init_syscalls()
 	register_syscall(1,  (void*)static_cast<void (*) (char, byte)>(&term_putc));
 	register_syscall(2,  (void*)static_cast<void (*) (const char*, byte)>(&term_print));
 	register_syscall(3,  (void*)static_cast<void (*) (int)>(&term_print_hex));
+	register_syscall(8,  (void*)static_cast<void (*) (char *)>(&get_wrapper));
 }
 
 

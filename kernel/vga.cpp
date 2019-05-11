@@ -131,11 +131,22 @@ void term_print_num(int num, unsigned base)
 	itoa(num ,dl, base);
 	term_print(dl);
 }
+void term_print_num(int num, unsigned base, byte b)
+{
+	char dl[30];
+	itoa(num ,dl, base);
+	term_print(dl,b);
+}
 void term_print_dec(int num)
 {
 	term_print_num(num, 10);
 }
-void term_print_hex(int num)
+void term_print_dec(int num, byte b)
 {
+	term_print_num(num, 10,b);
+}
+void term_print_hex(int num)
+{	
+	term_print("0x");
 	term_print_num(num, 16);
 }

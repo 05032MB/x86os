@@ -1,7 +1,6 @@
 ﻿#ifndef INPUT_H
 #define INPUT_H
 
-#define NOINLINE __attribute__((noinline))
 
 #define	KEY_F1		0x80
 #define	KEY_F2		(KEY_F1 + 1)
@@ -54,35 +53,8 @@ static const unsigned char set1_map[] =
 /* 58 */KEY_F12
 	};
  
- NOINLINE
- uint8_t ps2_keyboard_get() //get raw keyboard input
- {
-	return inb(0x60); //reads from data port, see "8042" PS/2 Controller
- }
- NOINLINE
- char ps2_keyboard_resolve(uint8_t c)
- {
-	if(c>ARRSIZE(set1_map))return 0;
-	return set1_map[c];
- }
- NOINLINE
- char ps2_keyboard_listen()
- {
-	while(!(inb(0x64) & 1));//control bit is not set
-	return ps2_keyboard_get();
- }
- NOINLINE
- char get()
- {
-	//_cli();
-	char ret;
-	do{
-		ret = ps2_keyboard_resolve(ps2_keyboard_listen());
-	}while(!ret);
-	//_nop();
-	//_nop();
-	//_sti();
-	return ret;
- }
- 
+ char get();
+ void get_wrapper(char * c);
+
+
 #endif //INPUT_H
