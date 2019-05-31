@@ -43,32 +43,33 @@ void init_paging_phase_2();
 using page_t = dword;
 
 struct page_table_t{
-	page_t pages[1024];
+	page_t pages[PTSIZE];
 };
 
 struct page_dir_t{
-	page_table_t *tables[1024];
-	addr_t physAddr[1024]; //physical address for tables
+	page_table_t *tables[PTSIZE]; //pointers to above
+	addr_t physAddr[PTSIZE]; //physical address for tables
 	addr_t selfPhys; //physical address for self
 };
 
 //---------------
-extern ALIGNED_4kB dword page_directory[PTSIZE];
-extern ALIGNED_4kB dword page_table_primary[PTSIZE];
 
-bool set_page_dir(dword);
+//bool set_page_dir(dword);
 
 void page_fault_handler(const int_iden ii);
 
+void set_page_dir(page_dir_t *pg);
+
+bool memres(addr_t lo, addr_t hi); //reserves memory at given address range
 
 //assembly functions
-extern "C"{
+__ASM_IMPORT{
  dword _get_cr0(void);
  dword _get_cr3(void);
  dword _get_cr2(void);
  
- void __attribute__((fastcall)) _write_cr0(dword);
- void __attribute__((fastcall)) _write_cr3(dword);
+ void __fastcall _write_cr0(dword);
+ void __fastcall _write_cr3(dword);
  
 }
 

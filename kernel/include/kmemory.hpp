@@ -2,9 +2,8 @@
 #define _KMEMORY_H
 
 #include <types.hpp>
-#include <critical.hpp>
 
-#define to_addr_t(x) (addr_t)x
+//#define to_addr_t(x) (addr_t)x
 
 template<typename T>
 sword less_than(T a, T b);
@@ -52,11 +51,13 @@ class heap{
 		size_t size;
 		void* address;
 	
-	}__attribute__((packed));
+	}__packed;
 	
 	private:
 	heaparray<block> blocks_empty;	
 	heaparray<block> blocks_full;	
+
+	bool _lock = true;
 	
 	#define MINSPLITSIZE 1
 	
@@ -87,12 +88,30 @@ class heap{
 	void free(void* ptr);
 
 };
-
+/*
+Wywalić ten szit.
+Prawdziwy malloc niżej.
+*/
 void * kalloc(void* a,size_t size, bool align, addr_t);
+
+/*
+Only legit internal malloc working without system heap
+Params:
+->Target Address
+->Size of gap
+->Align to lower page boundary?
+Returns:
+->start address (return)
+->end address (fin)
+
+*/
+addr_t ubermalloc(addr_t where, size_t size, bool p_align, addr_t *fin );
 
 void init_heap(void);
 
 extern heap sysheap;
+
+#define __FREE(s) sysheap.__dealloc(s)
 
 #define __ALLOC(s) sysheap.__alloc(s) //alloc macro
 #define __SALLOC(obj) __ALLOC(sizeof(obj))	//simple alloc macro

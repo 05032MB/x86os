@@ -1,4 +1,6 @@
 ﻿#include <kmemory.hpp>
+#include <logger.hpp>
+#include <critical.hpp>
 
 #ifdef __k_debug
 #include <stdio.h>
@@ -100,6 +102,8 @@ heap::heap(addr_t a, size_t s){
 	this->blocks_full.init_no_alloc((heap::block *)a, s, &heap::less_than_heap);
 	begheap = (void*)(a+sizeof(heaparray<heap::block>)*s);
 	currheap = begheap;
+
+	_lock = false;
 }
 bool heap::add_block(size_t s, addr_t address, bool empty)
 {
@@ -150,6 +154,7 @@ void heap::free(void* ptr)
 #pragma GCC diagnostic ignored "-Wpointer-arith" //until better solution is found
 void * heap::__alloc(size_t size)
 {
+	if(_lock)kpanic("Sysheap is locked.");
 	for(size_t i =0; i<blocks_empty.get_size(); i++)
 	{
 		if(blocks_empty.lookup(i).size >= size)
@@ -178,6 +183,7 @@ void * heap::__alloc(size_t size)
 
 void * heap::__aalloc(size_t size, size_t alignment) //only works with 2^n alignment
 {
+	if(_lock)kpanic("Sysheap is locked.");
 	for(size_t i =0; i<blocks_empty.get_size(); i++)
 	{
 		if(blocks_empty.lookup(i).size >= size && (to_addr_t(blocks_empty.lookup(i).address)%alignment == 0))
@@ -210,7 +216,7 @@ void * heap::__aalloc(size_t size, size_t alignment) //only works with 2^n align
 
 void heap::__dealloc(void * ptr)
 {
-
+	if(_lock)kpanic("Sysheap is locked.");
  	for(size_t i=0; i<blocks_full.get_size(); i++)
 	{
 		if(to_addr_t(blocks_full.lookup(i).address) == to_addr_t(ptr))
@@ -254,13 +260,27 @@ void * kalloc(void* currheap,size_t size, bool align, addr_t begheap) //dangerou
 	memset(currheap, 0, size);
 	return currheap;
 }
+
+addr_t ubermalloc(addr_t where, size_t size, bool p_align, addr_t *fin )
+{
+	if(p_align)
+	{
+		where = where - (where % 4096); //page size;
+	}
+	auto ret = where;
+	where +=size;
+
+	*fin = where;
+
+	return ret;
+}
 #pragma GCC diagnostic pop
 
 heap sysheap;
 	
 void init_heap()
 {
-	sysheap = heap(to_addr_t(endkernel),300); //start address, max blocks amount	
+	sysheap = heap(to_addr_t(endkernel)+0x200000,300); //start address, max blocks amount	
 
 	/*int *ptr3 = (int*)sysheap.__alloc(8);
 	int *ptr = (int*)sysheap.__aalloc(8,1024);

@@ -1,22 +1,14 @@
 #include <gdt.hpp>
 
 #include <string.h>	
+#include <types.hpp>
+#include <logger.hpp>
 
 gdtptr gdtp;
 gdtentry gdt[GDTMAX];
 tss_entry tss_main;
 
-#ifdef __k_debug
-#include <stdio.h>
-#include <stdlib.h>
-__attribute__((used))
-static void dputs(int a)
-{
-	char tr[50];
-	itoa(a, tr, 10);
-	puts(tr);
-}
-#endif
+__ASM_IMPORT void * auxillary_stack_top;
 
 void gdt_install(unsigned num)//num - number of entries
 {
@@ -69,9 +61,14 @@ void init_gdt_entries()
 	init_gdt_entry(&gdt[4], 0, 0xFFFFFFFF, GDT_DATA_PL3); //0x23
 	init_gdt_entry(&gdt[5], to_addr_t(&tss_main),to_addr_t(&tss_main)+ sizeof(tss_main), (SEG_GRAN(0) | SEG_EX(1) |  SEG_PRIV(3) | SEG_PRES(1) | SEG_AC(1) | SEG_DESCTYPE(0))); //mandatory tss entry
 	
-	tss_main.esp0 = _get_esp(); //fix it !!!! !!!!
+	tss_main.esp0 = reinterpret_cast<dword>(&auxillary_stack_top); //lepiej //_get_esp(); //fix it !!!! !!!!
+
+	term_log("Auxillary stack is at: ",tss_main.esp0, LOG_MINOR);
+
 	tss_main.ss0 = get_segment_selector_GDT(2,0);
 	
+	//tss_main.esp2 = 0xA00000+200;
+
 	tss_main.cs   = get_segment_selector_GDT(1,3);
 	tss_main.ss = tss_main.ds = tss_main.es = tss_main.fs = tss_main.gs = get_segment_selector_GDT(2,3);
 }

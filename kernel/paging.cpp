@@ -1,22 +1,12 @@
 #include <paging.hpp>
+#include <logger.hpp>
+#include <mtracker.hpp>
 
 ALIGNED_4kB//4KiB in bytes; 4KiB aligned
 dword page_directory[PTSIZE]; //4KiB /32 = 1024
 
 ALIGNED_4kB
 dword page_table_primary[PTSIZE]; //maps first 4MB, for kernel, stack
-
-#ifdef __k_debug
-#include <stdio.h>
-#include <stdlib.h>
-__attribute__((used))
-static void dputs(unsigned int a)
-{
-	char tr[50];
-	itoa(a, tr, 16);
-	puts(tr);
-}
-#endif
 
 static void populate_page_directory()
 {
@@ -30,9 +20,9 @@ static void init_primary_page_table()
 {
 	page_directory[0] = 2 + 5;//write enabled
 	
-	for(int i = 0; i < PTSIZE; i++)page_table_primary[i] = (i * 0x1000) | 0xF;//0xB; //supervisor, rw, present
+	for(int i = 0; i < PTSIZE; i++)page_table_primary[i] = (i * 0x1000) | 0xB;//0xF; //supervisor, rw, present
 	page_directory[0] |= ((dword)page_table_primary );
-	page_directory[0] |= 0xF;//0xB;
+	page_directory[0] |= 0xB;//0xF;
 }
 void * translate_virtual_to_physical(void * virtualaddr)
 {
@@ -72,8 +62,7 @@ void page_fault_handler(const int_iden ii)
 	
 	
 	#ifdef __k_debug
-	term_print("Page Fault debug information:");
-	term_print_hex(fault_loc);
+	term_log("Page Fault debug information: ", fault_loc, LOG_CRITICAL);
 	kpanic("Page Fault");
 	#endif //i assume that there would be no need to panic after more coding
 }
@@ -83,11 +72,19 @@ void init_paging()
 	//populate_page_directory();
 	init_primary_page_table();
 	
+
+	//set_page_dir(page_directory);
 	_write_cr3((dword)&page_directory);
 	_write_cr0(0x80000000 | _get_cr0());
 }
 
-__attribute__((optimize("-O0")))
+void set_page_dir(page_dir_t *pg)
+{
+	_write_cr3(to_addr_t(pg) );
+	_write_cr0(0x80000000 | _get_cr0());
+}
+
+__nooptimize
 static void poke_addr(addr_t addr)
 {
 	int* pointer = (int*)addr;
@@ -109,12 +106,36 @@ void init_paging_phase_2()
 	dword* page_table_3 = (dword*)init_pagedir_entry(&page_directory[2], 0xF);//user
 	for(int i =0; i<1024; i++)init_frame(&page_table_3[i], 0xA00000 + i*4*1024 , 0xF); //[10MB;14MB), user memory
 	
+	dword* page_table_33 = (dword*)init_pagedir_entry(&page_directory[32], 0xF);
+	for(int i =0; i<1024; i++)init_frame(&page_table_33[i], 0x8048000 + i*4*1024, 0xF); //128 meg
 	/*poke_addr(0xA00001);//ok
 	poke_addr(0x400000);//ok
 	poke_addr(0x799999);
 	poke_addr(0x800001);//?
 	poke_addr(0xA00000-0x2);//?
 	//poke_addr(0xFFFFFFF);*/
-	
+	/*pTracker.init(PTSIZE*PTSIZE);
+	term_log("MM tracker initialized.",LOG_OK);
 
+	if(!memres(0, 0xE00000))
+	{
+		term_log("Kernel mem reservation failed.", LOG_CRITICAL);
+		kpanic("No sorry.");
+	}
+	term_log("Memory for kernel reserved, up to: ", 0xE00000, LOG_OK);*/
+
+}
+
+bool memres(addr_t lo, addr_t hi)
+{
+	for(size_t i = lo; i <= hi; i++ )
+		if(pTracker.testFrame(i)){
+			term_log("[MEMRES:] Failed to reserve: ", i, LOG_MINOR);
+			return false;
+		}
+	for(size_t i = lo; i <= hi; i++ ){
+		pTracker.setFrame(i);
+		//init_frame()
+	}
+	return true;
 }

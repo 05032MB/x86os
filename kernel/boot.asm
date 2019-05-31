@@ -23,6 +23,10 @@ align 4
  
 section .bss
 align 32
+exp auxillary_stack_bottom:
+resb 16384 ; 16
+exp auxillary_stack_top:
+
 stack_bottom:
 resb 16384*2 ; 32 KiB
 stack_top:

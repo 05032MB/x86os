@@ -192,6 +192,24 @@ exp switch_to_ring_3: ;fastcall, cx - function address
 	;hlt
 	iret
 
+exp _jump_as_if_userspace_task: ;fastcall, ecx - function address, edx - new stack
+	cli
+	mov esp, edx ; jest ok
+	mov ax, [USER_DS]
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+
+	mov eax, esp
+	push dword [USER_DS]
+	push dword eax
+	pushf
+	push dword [USER_CS]
+	push dword ecx
+
+	iret
+
 exp _lets_err:
 	;cli
 	pushad

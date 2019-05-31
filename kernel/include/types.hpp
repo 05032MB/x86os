@@ -16,6 +16,7 @@ typedef int32_t sdword;
 
 typedef word paddr;
 typedef dword addr_t;
+typedef dword offset_t;
 
 typedef long unsigned int size_t;
 
@@ -27,6 +28,8 @@ typedef long unsigned int size_t;
 #define __maxoptimize __attribute__((optimize("-O3")))
 #define __nonreturn __attribute__((nonreturn))
 #define __fastcall __attribute__((fastcall))
+#define __used __attribute__((used))
+#define __ASM_IMPORT extern "C"
 
 
 #endif //TYPES_H

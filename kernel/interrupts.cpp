@@ -123,7 +123,7 @@ __attribute__((optimize("-O0")))
 
 	#ifdef __k_debug
 	//dputs(ii.iden);
-	if(ii.iden <= 48 || ii.iden == 80)puts(msg[ii.iden]);
+	//if(ii.iden <= 48 || ii.iden == 80)puts(msg[ii.iden]);
 	int z =0;
 	//if(ii.iden != 33){/*halt();*/while(z++ < 100000000)_nop();}
 	#endif

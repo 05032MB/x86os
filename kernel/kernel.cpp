@@ -1,9 +1,43 @@
-﻿#include <_kmaster.hpp>
+﻿#include <stddef.h>
+#include <stdint.h>
+#include <types.hpp>
+#include <interrupts.hpp>
+#include <kmemory.hpp>
+#include <gdt.hpp>
+#include <paging.hpp>
+
+#include <stdlib.h>
+#include <stdio.h>
+
+
+  #define ARRSIZE(x)  (sizeof(x) / sizeof((x)[0]))
+ 
+#include <input.hpp>
+#include <vga.hpp>
+#include <syscalls.hpp>
+
+
+//Assembler functions
+
+extern "C" 
+{
+void halt();
+void _cli();
+void _sti();
+void _nop();
+void init_idt();
+void _lets_err();
+void __attribute__((fastcall))switch_to_ring_3(void(*)());
+void __attribute__((fastcall))switch_to_ring_0();
+}
 
 #include <multiboot.hpp>
 #include <vfs.hpp>
 #include <bfs.hpp>
 #include <elf.hpp>
+#include <logger.hpp>
+#include <mtracker.hpp>
+#include <task.hpp>
  
 // First, let's do some basic checks to make sure we are using our x86-elf cross-compiler correctly
 #if defined(__linux__)
@@ -38,8 +72,11 @@
 extern "C" void kernel_main(multiboot_info_t *mbinfo)
 {
 	term_init();
+
+	term_log("Kernel ends at: " , to_addr_t(&endkernel) ,LOG_MINOR);
+
 	term_print("VGA display ready\n");
-	
+	//asm("hlt");
 	term_print("Found GRUB modules: ");
 	term_print_dec(mbinfo->mods_count);
 	
@@ -75,7 +112,6 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 	term_print("Interrupts are configured\n");
 	init_paging();
 	term_print("Paging is ready\n");
-
 	init_heap();
 	term_print("Sysheap ready\n");
 	
@@ -99,13 +135,16 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 	//term_print_dec(noder->inode);
 	auto btstrp = ELF::load_elf(reinterpret_cast< ELF::ELF32_Header* >( *reinterpret_cast<dword*> (  mbinfo->mods_addr +16  ) ) );
 
+	only_task.prepare_task(nullptr, nullptr, to_addr_t(btstrp), -1);
+
 	term_print("Hello, World!\n", VGA_COLOR_GREEN);
 	term_print("Welcome to the kernel.\n", VGA_COLOR_CYAN << 4);
 	
 	term_print("Boot completed\n");
 	term_print("----------------------\n",VGA_COLOR_MAGENTA);
 	
-	switch_to_ring_3((void(*)())btstrp/*_lets_err*/);
+	only_task.launch_task();
+	//switch_to_ring_3((void(*)())btstrp/*_lets_err*/);
 	//switch_to_ring_0();
 	term_print("\nSuccessfully tested ring3");
 	

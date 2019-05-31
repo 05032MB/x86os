@@ -12,3 +12,6 @@
 /lib/*.bat
 /compiler
 *.ipch
+*.sublime-project
+*.sublime-workspace
+*.sublime-build
