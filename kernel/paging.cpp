@@ -1,5 +1,6 @@
 #include <paging.hpp>
 #include <logger.hpp>
+#include <kmemory.hpp>
 #include <mtracker.hpp>
 
 ALIGNED_4kB//4KiB in bytes; 4KiB aligned
@@ -7,6 +8,8 @@ dword page_directory[PTSIZE]; //4KiB /32 = 1024
 
 ALIGNED_4kB
 dword page_table_primary[PTSIZE]; //maps first 4MB, for kernel, stack
+
+//dword *rest_of_page_tables[PTSIZE*PTSIZE - 1];
 
 static void populate_page_directory()
 {
@@ -18,7 +21,7 @@ static void populate_page_directory()
 
 static void init_primary_page_table()
 {
-	page_directory[0] = 2 + 5;//write enabled
+	//page_directory[0] = 2 + 5;//write enabled
 	
 	for(int i = 0; i < PTSIZE; i++)page_table_primary[i] = (i * 0x1000) | 0xB;//0xF; //supervisor, rw, present
 	page_directory[0] |= ((dword)page_table_primary );
@@ -41,11 +44,8 @@ void* init_pagedir_entry(dword* dir_entry, word flags) //creates aligned ENTRY i
 
 }
 
-void init_frame(/*addr_t virtual_addr*/dword* tab_entry, addr_t phys_addr, word flags)
+void init_frame(dword* tab_entry, addr_t phys_addr, word flags)
 {
-	//dword *pointer = (dword*)sysheap.__aalloc(sizeof(frame),0x1000);
-	
-	//virtual_addr = virtual_addr & ~(0xFFF); //assure it's 4KiB aligned
 	phys_addr = phys_addr & ~(0xFFF); //assure it's 4KiB aligned
 	
 	*tab_entry = (dword)((to_addr_t(phys_addr)  & ~(0xFFF)) | flags);
@@ -76,6 +76,12 @@ void init_paging()
 	//set_page_dir(page_directory);
 	_write_cr3((dword)&page_directory);
 	_write_cr0(0x80000000 | _get_cr0());
+
+	/*for(int i = 1; i < PTSIZE; i++)
+	{
+		rest_of_page_tables[i] = nullptr;
+	} */
+
 }
 
 void set_page_dir(page_dir_t *pg)
@@ -95,13 +101,30 @@ static void poke_addr(addr_t addr)
 
 }
 
+/*void map_page(addr_t virt, addr_t phys, word flags)
+{
+	auto entr = virt / (PTSIZE*PTSIZE);
+	auto off = virt % (PTSIZE*PTSIZE);
+	if(page_directory[entr] == nullptr)
+	{
+		init_pagedir_entry(&page_directory[i], flags);
+	}
+	if(rest_of_page_tables[entr + off] == nullptr)
+	{
+		rest_of_page_tables[i] = reinterpret_cast<dword *>(__AALLOC(dword, 0x1000));
+	}
+	//init_frame(&rest_of_page_tables)
+
+}*/
+
 void init_paging_phase_2()
 {	
 
 	/*dword* page_table_2 = (dword*)init_pagedir_entry(&page_directory[1], 0xB);
 	init_frame(&page_table_2[0], 0x400000 , 0xB); */
+
 	dword* page_table_2 = (dword*)init_pagedir_entry(&page_directory[1], 0xF);//krnl
-	for(int i =0; i<1024; i++)init_frame(&page_table_2[i], 0x400000 + i*4*1024 , 0xF); //[4MB;8MB), system memory
+	for(int i =0; i<1024; i++)init_frame(&page_table_2[i], 0x400000 + i*4*1024 , 0xB); //[4MB;8MB), system memory
 	
 	dword* page_table_3 = (dword*)init_pagedir_entry(&page_directory[2], 0xF);//user
 	for(int i =0; i<1024; i++)init_frame(&page_table_3[i], 0xA00000 + i*4*1024 , 0xF); //[10MB;14MB), user memory
