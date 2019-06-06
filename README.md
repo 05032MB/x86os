@@ -1,19 +1,27 @@
 # x86os
 
 x86 operating system.
+For Intel 32-bit machine.
 
-Things that work (partially):
+Things that work 
 
- - Interrupts
- - Paging (nope)
+ - multiboot-compliancy
+ - Interrupts & SystemCalls
  - GDT
+ - VGA
+ - Heap ?
+
+Things that need polishing
+
+- Paging
+- Userland
+- Tasks
+- Filesystems
 
 Things to do in near future:
 
- - mem management
- - userspace
- - ATA 
- - multiboot
+ - mem management fix/new
+ - ATA driver
 
 
 ----------
@@ -34,7 +42,8 @@ Things to do in near future:
    - Make binaries
    - NASM binaries
    - QEMU binaries
-
+   
+6. Install mkisofs 2.+ (to build bootable iso), into *utility/isogen*
 ## Check dependencies
 
 Try following commands:
