@@ -83,6 +83,7 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 	unsigned short modsnum  = mbinfo->mods_count; 
 	
 	dword trav_helper = mbinfo->mods_addr;
+	dword mod_last_end;
 	
 	for(decltype(modsnum) i = 0; i < modsnum; i++){ //counts grub modules
 	
@@ -102,21 +103,23 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 		term_print(",found and taken into account",VGA_COLOR_LIGHT_GREY );
 		
 		trav_helper += 16;
+		mod_last_end = modend;
    
 	}
-	
+	term_print("\n");
 	
 	init_gdt();
 	term_print("\nMemory segmented\n");
 	init_interrupts(); //add support for APIC if available
 	term_print("Interrupts are configured\n");
 	init_paging();
-	term_print("Paging is ready\n");
-	init_heap();
+	term_print("Paging is ready (1/2)\n");
+	init_heap(mod_last_end);
 	term_print("Sysheap ready\n");
 	
 	init_paging_phase_2();
-	
+	term_print("Paging is ready (2/2) \n");
+
 	init_syscalls();
 	term_print("System calls initialized\n");
 	

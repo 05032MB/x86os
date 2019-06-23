@@ -263,6 +263,11 @@ exp _write_cr3:
 	mov cr3, ecx
 	ret
 	
+exp _reload_tlbs
+	mov eax, cr3
+	mov cr3, eax
+	ret
+
 exp _invlpg:
 	invlpg [ecx]
 	ret

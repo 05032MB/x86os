@@ -37,6 +37,8 @@ void term_print_num(int, unsigned, byte);
 void term_print_dec(int);
 void term_print_dec(int, byte);
 void term_print_hex(int);
+void term_print_hex(dword);
+void term_print_hex(dword, byte);
 
 
 extern volatile uint16_t* vga_buffer;

@@ -278,10 +278,10 @@ addr_t ubermalloc(addr_t where, size_t size, bool p_align, addr_t *fin )
 
 heap sysheap;
 	
-void init_heap()
+void init_heap(addr_t where)
 {
-	sysheap = heap(to_addr_t(endkernel)+0x200000,300); //start address, max blocks amount	
-
+	sysheap = heap(where+0xF/*to_addr_t(endkernel)+0x100000*/,300); //start address, max blocks amount	
+	term_log("Sysheap resides at=", where+0xF, LOG_OK);
 	/*int *ptr3 = (int*)sysheap.__alloc(8);
 	int *ptr = (int*)sysheap.__aalloc(8,1024);
 	int *ptr2 = (int*)sysheap.__alloc(8);

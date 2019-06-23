@@ -17,3 +17,9 @@ void term_log(const char * str, int val, unsigned logtype)
 	term_print_dec(val, logtype);
 	term_print("\n");
 }
+void term_log_hex(const char * str, dword val, unsigned logtype)
+{
+	term_log_internal(str, logtype, '>');
+	term_print_hex((dword) val, logtype);
+	term_print("\n");
+}

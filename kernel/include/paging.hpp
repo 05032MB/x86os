@@ -5,11 +5,14 @@
 #include <critical.hpp>
 #include <interrupts.hpp>
 #include <kmemory.hpp>
+#include <mtracker.hpp>
 
 #define PTSIZE 1024
 
 #define ALIGNED_4kB __attribute__((aligned(4096)))
 #define ALIGNED_4MB __attribute__((aligned(4194304)))
+
+extern ALIGNED_4kB dword page_directory[PTSIZE];
 
 void init_paging();
 void init_paging_phase_2();
@@ -17,8 +20,8 @@ void init_paging_phase_2();
 //----------------------
 	/*Page table ebtry structure explained
 	-----------------------------------------------------------------------------------------------------------------------------------------
-    | 31-12|                                  |11...9		 |8		|7  |6		   |5	    |4	        |3			 |2			  		   |1		    |0	    |bits
-    |Address of frame (lower 12 bits set to 0)|Bits for me :)|Global|0  |DirtyBit  |Accessed|DisablCache|WriteThrough|Supervisor(0)/User(1)|Read/Write  |Present|function
+    | 31-12                                   |11...9		 |8		|7  |6		   |5	    |4	        |3			 |2			  		   |1		         |0	     |bits
+    |Address of frame (lower 12 bits set to 0)|Bits for me   |Global|0  |DirtyBit  |Accessed|DisablCache|WriteThrough|Supervisor(0)/User(1)|Read(0)/Write(1) |Present|function
 	-----------------------------------------------------------------------------------------------------------------------------------------
 	*/
 #define ENTR_GLOBAL(x) x<<8
@@ -27,8 +30,8 @@ void init_paging_phase_2();
 
 	/*Page directory entry structure explained
 	-----------------------------------------------------------------------------------------------------------------------------------------------------------
-    | 31-12|                                  |11...9		 |8			|7		   |6	|5		 |4	         |3			  |2		      |1		 |0	     |bits
-    |Address          (lower 12 bits set to 0)|Bits for me :)|Ignored   |PageSize  |0	|Accessed|DisablCache|WriteThrough|User/Supervisor|Read/Write|Present|function
+    | 31-12                                   |11...9	   |8		  |7		 |6	|5		 |4	         |3			  |2		      |1		 |0	     |bits
+    |Address          (lower 12 bits set to 0)|Bits for me |Ignored   |PageSize  |0	|Accessed|DisablCache|WriteThrough|User/Supervisor|Read/Write|Present|function
 	-----------------------------------------------------------------------------------------------------------------------------------------------------------
 	set 7 to 1 to align 4MiB, otherwise it's 4KiB aligned
 	*/
@@ -39,7 +42,10 @@ void init_paging_phase_2();
 #define ENTR_USER(x) x<<2
 #define ENTR_RW(x) x<<1
 #define ENTR_PRESENT(x) x
-//----------------
+
+
+#define ONLY_ADDR(x) (x & 0xFFFFF000)
+//----------------Pewnie tego nie użyję
 using page_t = dword;
 
 struct page_table_t{
@@ -58,9 +64,9 @@ struct page_dir_t{
 
 void page_fault_handler(const int_iden ii);
 
-void set_page_dir(page_dir_t *pg);
+void set_page_dir(void *pg);
 
-bool memres(addr_t lo, addr_t hi); //reserves memory at given address range
+size_t fmemmap(addr_t virt, size_t size, word flags, mtracker *mt, dword * page_directory = page_directory);
 
 //assembly functions
 __ASM_IMPORT{
@@ -68,6 +74,9 @@ __ASM_IMPORT{
  dword _get_cr3(void);
  dword _get_cr2(void);
  
+ //Flushes tlb buffers, needs to be called after page changes
+ void _reload_tlbs(void);
+
  void __fastcall _write_cr0(dword);
  void __fastcall _write_cr3(dword);
  

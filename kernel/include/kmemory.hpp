@@ -107,11 +107,13 @@ Returns:
 */
 addr_t ubermalloc(addr_t where, size_t size, bool p_align, addr_t *fin );
 
-void init_heap(void);
+void init_heap(addr_t);
 
 extern heap sysheap;
 
 #define __FREE(s) sysheap.__dealloc(s)
+
+#define __AALLOC(x, y) sysheap.__aalloc(x,y)
 
 #define __ALLOC(s) sysheap.__alloc(s) //alloc macro
 #define __SALLOC(obj) __ALLOC(sizeof(obj))	//simple alloc macro
@@ -120,6 +122,6 @@ extern heap sysheap;
 
 extern void* endkernel; //from linkerscript, address of kernel ending
 extern void* begkernel; //from linkerscript, address of kernel beginning
-extern void* prekernel; //0,propably
+extern void* prekernel; //0,probably
 
 #endif

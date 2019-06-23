@@ -16,5 +16,6 @@ enum{
 void term_log_internal(const char * str, unsigned logtype, char prefix = '>');
 void term_log(const char * str, unsigned logtype);
 void term_log(const char * str, int value, unsigned logtype);
+void term_log_hex(const char * str, dword value, unsigned logtype);
 
 #endif

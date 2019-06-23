@@ -1,5 +1,7 @@
 #include <elf.hpp>
 #include <string.h>
+#include <paging.hpp>
+
 
 using namespace ELF;
 
@@ -113,9 +115,13 @@ static void * load_elf_exec(ELF32_Header *hdr)
 					return nullptr;
 				}
 				else if(ph->p_memsz > ph->p_filesz){
+					term_log("Mapped bytes=", fmemmap(to_addr_t(hdr) + ph->p_offset, ph->p_memsz, ENTR_PRESENT(1) | ENTR_RW(1) | ENTR_USER(1) | ENTR_WRITETHROUGH(1), &pTracker), LOG_WARNING);
 					memset((void*)to_addr_t(hdr) + ph->p_offset, 0, ph->p_memsz);
 				}
-				else memcpy((void*)ph->p_vaddr, (const void*)to_addr_t(hdr) + ph->p_offset, ph->p_filesz);
+				else {
+					term_log("Mapped bytes=", fmemmap(ph->p_vaddr, ph->p_filesz, ENTR_PRESENT(1) | ENTR_RW(1) | ENTR_USER(1) | ENTR_WRITETHROUGH(1), &pTracker), LOG_WARNING);
+					memcpy((void*)ph->p_vaddr, (const void*)to_addr_t(hdr) + ph->p_offset, ph->p_filesz);
+				}
 				break;
 			}
 			default:

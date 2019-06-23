@@ -150,3 +150,14 @@ void term_print_hex(int num)
 	term_print("0x");
 	term_print_num(num, 16);
 }
+void term_print_hex(dword num)
+{
+	term_print_hex(num, term_color);
+}
+void term_print_hex(dword num, byte c)
+{	
+	term_print("0x", c);
+	char liczb[30];
+	itoa(num, liczb, 16);
+	term_print(liczb, c);
+}
