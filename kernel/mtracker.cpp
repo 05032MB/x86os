@@ -64,10 +64,10 @@ void* mtracker::findFreeFrame()
 	{
 		auto pack = (reinterpret_cast<byte *>(_bits))[i];
 		//term_log("", pack, LOG_MINOR);
-		for(unsigned f = 1; pack != 0; f++ )
+		for(unsigned f = 0; pack != 0; f++ )
 		{
-			if( (pack & (1<<f) ) == 1){
-				return voidcast(i * 8 + f - 1);
+			if( (pack & (1<<f) )){
+				return voidcast((i * 8 + f) * 0x1000);
 			}
 		}
 	}
