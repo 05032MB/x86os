@@ -2,13 +2,6 @@
 #define _INTERRUPTS_H
 
 #include <types.hpp>
-#include <ports.hpp>
-#include <gdt.hpp>
-
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 
 #define MPIC1 0x20
@@ -19,7 +12,7 @@
 
 #define INTTOP 256//256
 
-//privilage levels
+//privilege levels
 #define RING_0 0x0
 #define RING_1 0x1
 #define RING_2 0x2
@@ -34,14 +27,6 @@
 //TODO: add call gates
 
 #define EOI 0x20
-void init_pic(byte low, byte high);
-
-//void ocw (paddr port, byte command); //exec operational command word
-
-void master_eoi();
-
-void slave_eoi();
-
 
 struct idtptr {
     word limit; //length in BYTES
@@ -69,22 +54,18 @@ dword eip,cs, eflags, usp, ss; //INT
 
 } __packed;
 
-extern idtptr idtp;
-extern idtseg idt[INTTOP];
 
 typedef void (*isr_func_t)(const int_iden);
 
-extern isr_func_t int_handlers[INTTOP];
+//extern isr_func_t int_handlers[INTTOP];
 
 void register_interrupt_handler(word interrupt, isr_func_t fun);
 
 void init_interrupts();
 
-void idt_install();
+/*void idt_install();
 bool init_idt_segs();
-bool init_idt_seg(idtseg* ptr, int selector, int flags, int offset2);
-
-extern void page_fault_handler(const int_iden); //in paging.hpp
+bool init_idt_seg(idtseg* ptr, int selector, int flags, int offset2);*/
 
 
 #endif

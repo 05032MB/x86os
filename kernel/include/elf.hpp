@@ -2,7 +2,6 @@
 #define _ELF_H
 
 #include <types.hpp>
-#include <stdio.h>
 
 extern dword * current_directory;
 

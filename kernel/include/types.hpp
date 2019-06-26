@@ -31,7 +31,7 @@ typedef long unsigned int size_t;
 #define __packed __attribute__((packed)) 
 #define __nooptimize __attribute__((optimize("-O0")))
 #define __maxoptimize __attribute__((optimize("-O3")))
-#define __nonreturn __attribute__((nonreturn))
+#define __noreturn __attribute__((noreturn))
 #define __fastcall __attribute__((fastcall))
 #define __used __attribute__((used))
 #define __ASM_IMPORT extern "C"

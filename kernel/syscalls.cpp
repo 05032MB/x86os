@@ -3,7 +3,11 @@
 #include <task.hpp>
 #include <logger.hpp>
 
- void* syscalls[SYSCALL_MAX];
+__ASM_IMPORT{
+	 __fastcall void _syscall_exec(const int_iden); //pewnie nie istnieje
+}
+
+void* syscalls[SYSCALL_MAX];
  
 void test_syscall(char, byte)
 {

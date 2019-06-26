@@ -1,5 +1,13 @@
 ﻿#include <interrupts.hpp>
 
+#include <ports.hpp>
+#include <gdt.hpp>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+extern void page_fault_handler(const int_iden); //in paging.hpp
+
 idtptr idtp;
 idtseg idt[INTTOP];
 
@@ -71,6 +79,23 @@ void idt_install()
     _lidt((idtptr*)&idtp);
 }
 
+bool init_idt_seg(idtseg* ptr, int selector, int flags, int pointer)
+{
+	//add memset
+	//if(num > INTTOP-1)return false;
+	word low = pointer & 0xffff;
+	word high = (pointer & 0xffff0000) >> 16;
+	
+	
+	(*ptr).offset1 = low;
+	(*ptr).selector = selector;
+	(*ptr).zero = 0;	
+	(*ptr).type = flags;
+	(*ptr).offset2 = high;
+	
+	return true;
+}
+
 __nooptimize //otherwise some weird happens. Compile with different version and check if also occurs
 bool init_idt_segs()
 {
@@ -89,23 +114,6 @@ bool init_idt_segs()
 	ocw(MPIC2, 0xFD); //odmaskowuje irq2
 	
 	_sti(); //zaczynamy obsługiwać irq
-	
-	return true;
-}
-
-bool init_idt_seg(idtseg* ptr, int selector, int flags, int pointer)
-{
-	//add memset
-	//if(num > INTTOP-1)return false;
-	word low = pointer & 0xffff;
-	word high = (pointer & 0xffff0000) >> 16;
-	
-	
-	(*ptr).offset1 = low;
-	(*ptr).selector = selector;
-	(*ptr).zero = 0;	
-	(*ptr).type = flags;
-	(*ptr).offset2 = high;
 	
 	return true;
 }

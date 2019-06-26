@@ -41,14 +41,14 @@ void term_print_hex(dword);
 void term_print_hex(dword, byte);
 
 
-extern volatile uint16_t* vga_buffer;
+//extern volatile uint16_t* vga_buffer;
 extern const int VGA_COLS ;
 extern const int VGA_ROWS ;
 
 extern bool scrolling;
  
-extern int term_col;
-extern int term_row ;
-extern byte term_color;
+//extern int term_col;
+//extern int term_row ;
+//extern byte term_color;
 
 #endif

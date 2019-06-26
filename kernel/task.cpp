@@ -31,16 +31,15 @@ void task2::launch()
 }
 void task2::suspend()
 {
-	
+
 }
 
 task2 only_task;
 
 ///////////////
 
-__nooptimize
 void task2::yield()
 {
-	term_log("Yield test call", 1,LOG_CRITICAL);
+	term_log("Yield test call", 1,LOG_MINOR);
 	halt();
 }
