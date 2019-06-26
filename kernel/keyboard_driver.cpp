@@ -6,6 +6,11 @@
 
 #define ARRSIZE(x)  (sizeof(x) / sizeof((x)[0]))
 
+__ASM_IMPORT{
+	void _sti();
+	void _cli();
+}
+
 uint8_t ps2_keyboard_get() //get raw keyboard input
 {
 	return inb(0x60); //reads from data port, see "8042" PS/2 Controller

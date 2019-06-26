@@ -46,9 +46,9 @@ void slave_eoi();
 struct idtptr {
     word limit; //length in BYTES
     dword base; //pointer
-} __attribute__ ((packed));
+} __packed;
 
-extern "C" __attribute__((fastcall)) void _lidt(idtptr* i); //AKA dword i (only address matters really)
+__ASM_IMPORT __fastcall void _lidt(idtptr* i); //AKA dword i (only address matters really)
 
 struct idtseg{
 	word offset1; //0-15 bit(low)
@@ -56,7 +56,7 @@ struct idtseg{
 	byte zero; //zero
 	byte type; //flags	
 	word offset2; //48-63 bit(high)
-} __attribute__ ((packed));
+} __packed;
 
 struct int_iden
 {
@@ -65,9 +65,9 @@ dword gs, fs, es, ds;
 dword edi, esi, ebp, esp, ebx, edx, ecx, eax; //pushad
 dword iden, e_code; //isr
 
-//dword eip,cs, eflags, usp, ss; //INT
+dword eip,cs, eflags, usp, ss; //INT
 
-}__attribute__((packed));
+} __packed;
 
 extern idtptr idtp;
 extern idtseg idt[INTTOP];
@@ -86,23 +86,5 @@ bool init_idt_seg(idtseg* ptr, int selector, int flags, int offset2);
 
 extern void page_fault_handler(const int_iden); //in paging.hpp
 
-extern "C" {
-	
-	void _cli();
-	void _sti();
-	void _nop();
-	void _halt();
-	
-	void _c_int_handler(int_iden ii); 
-//----
-	addr_t get_int_handler(); 
-
-	dword _get_isr_size(); 
-	addr_t _get_isr0_addr(); 
-
-	void int_handler(); 
-/* pushad exec popad iret */
-
-}
 
 #endif

@@ -23,6 +23,8 @@ typedef long unsigned int size_t;
 #undef to_addr_t
 #define to_addr_t(x) (addr_t)x
 
+#define ARRSIZE(x)  (sizeof(x) / sizeof((x)[0]))
+
 #undef voidcast
 #define voidcast(x) (reinterpret_cast<void *>(x))
 

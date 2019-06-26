@@ -5,8 +5,26 @@ idtseg idt[INTTOP];
 
 isr_func_t int_handlers[INTTOP];
 
+__ASM_IMPORT {
+	
+	void _cli();
+	void _sti();
+	void _nop();
+	void _halt();
+	
+	void _c_int_handler(int_iden ii); 
+//----
+	addr_t get_int_handler(); 
 
-__attribute__((used))
+	dword _get_isr_size(); 
+	addr_t _get_isr0_addr(); 
+
+	void int_handler(); 
+/* pushad exec popad iret */
+
+}
+
+__used
 static void dputs(int a)
 {
 	char tr[50];
@@ -53,7 +71,7 @@ void idt_install()
     _lidt((idtptr*)&idtp);
 }
 
-__attribute__((optimize("-O0"))) //otherwise some weird happens. Compile with different version and check if also occurs
+__nooptimize //otherwise some weird happens. Compile with different version and check if also occurs
 bool init_idt_segs()
 {
 	//word goodflag = 0x8E;
@@ -107,8 +125,8 @@ void register_interrupt_handler(word interrupt, isr_func_t fun)
 	int_handlers[interrupt] = fun;
 }
 
-__attribute__((optimize("-O0")))
- void _c_int_handler(const int_iden ii) 
+__nooptimize
+void _c_int_handler(const int_iden ii) 
  {
 	
 	const char* msg[] = {

@@ -13,6 +13,7 @@
 #define ALIGNED_4MB __attribute__((aligned(4194304)))
 
 extern ALIGNED_4kB dword page_directory[PTSIZE];
+//extern ALIGNED_4kB dword *current_directory;
 
 void init_paging();
 void init_paging_phase_2();
@@ -45,6 +46,7 @@ void init_paging_phase_2();
 
 
 #define ONLY_ADDR(x) (x & 0xFFFFF000)
+#define ONLY_DATA(x) (x & 0xFFF)
 //----------------Pewnie tego nie użyję
 using page_t = dword;
 
@@ -65,21 +67,12 @@ struct page_dir_t{
 void page_fault_handler(const int_iden ii);
 
 void set_page_dir(void *pg);
+void reset_global_pdir();
 
-size_t fmemmap(addr_t virt, size_t size, word flags, mtracker *mt, dword * page_directory = page_directory);
+size_t fmemmap(addr_t virt, size_t size, word flags, mtracker *mt, dword * page_directory = nullptr);
 
-//assembly functions
-__ASM_IMPORT{
- dword _get_cr0(void);
- dword _get_cr3(void);
- dword _get_cr2(void);
- 
- //Flushes tlb buffers, needs to be called after page changes
- void _reload_tlbs(void);
+dword * clone_ptable(dword * pt);
+dword * clone_pdir(dword * pd);
 
- void __fastcall _write_cr0(dword);
- void __fastcall _write_cr3(dword);
- 
-}
 
 #endif

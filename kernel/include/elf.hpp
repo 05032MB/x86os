@@ -4,6 +4,8 @@
 #include <types.hpp>
 #include <stdio.h>
 
+extern dword * current_directory;
+
 namespace ELF{
 
 #define ELF32_Addr dword
@@ -154,7 +156,7 @@ enum Prog_Types{
 	PT_PHDR,
 };
 
-void* load_elf(ELF32_Header*);
+void* load_elf(ELF32_Header*, dword * pdir = current_directory);
 bool check_elf_header(ELF32_Header*);
 
 }

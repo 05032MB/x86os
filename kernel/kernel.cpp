@@ -10,7 +10,6 @@
 #include <stdio.h>
 
 
-  #define ARRSIZE(x)  (sizeof(x) / sizeof((x)[0]))
  
 #include <input.hpp>
 #include <vga.hpp>
@@ -19,7 +18,7 @@
 
 //Assembler functions
 
-extern "C" 
+__ASM_IMPORT
 {
 void halt();
 void _cli();
@@ -136,9 +135,9 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 	//term_print("\n");
 	//term_print(noder->oid); term_print(":");
 	//term_print_dec(noder->inode);
-	auto btstrp = ELF::load_elf(reinterpret_cast< ELF::ELF32_Header* >( *reinterpret_cast<dword*> (  mbinfo->mods_addr +16  ) ) );
+	//auto btstrp = ELF::load_elf(reinterpret_cast< ELF::ELF32_Header* >( *reinterpret_cast<dword*> (  mbinfo->mods_addr +16  ) ) );
 
-	only_task.prepare_task(nullptr, nullptr, to_addr_t(btstrp), -1);
+	only_task.prepare_task_from_elf( voidcast(*reinterpret_cast<dword*> (  mbinfo->mods_addr +16  ) ) , voidcast(0xA00050), nullptr, current_directory);
 
 	term_print("Hello, World!\n", VGA_COLOR_GREEN);
 	term_print("Welcome to the kernel.\n", VGA_COLOR_CYAN << 4);
@@ -146,7 +145,7 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 	term_print("Boot completed\n");
 	term_print("----------------------\n",VGA_COLOR_MAGENTA);
 	
-	only_task.launch_task();
+	only_task.launch();
 	//switch_to_ring_3((void(*)())btstrp/*_lets_err*/);
 	//switch_to_ring_0();
 	term_print("\nSuccessfully tested ring3");

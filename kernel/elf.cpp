@@ -82,8 +82,9 @@ static void * load_elf_rel(ELF32_Header *hdr)
 	return nullptr;
 
 }
-static void * load_elf_exec(ELF32_Header *hdr)
+static void * load_elf_exec(ELF32_Header *hdr, dword * pdir)
 {
+	set_page_dir(pdir);
 	term_log("Loading elf exec.", LOG_MINOR);
 	void* entry = reinterpret_cast<void*>(hdr->e_entry);
 	/*term_print_dec((int)hdr);
@@ -115,11 +116,11 @@ static void * load_elf_exec(ELF32_Header *hdr)
 					return nullptr;
 				}
 				else if(ph->p_memsz > ph->p_filesz){
-					term_log("Mapped bytes=", fmemmap(to_addr_t(hdr) + ph->p_offset, ph->p_memsz, ENTR_PRESENT(1) | ENTR_RW(1) | ENTR_USER(1) | ENTR_WRITETHROUGH(1), &pTracker), LOG_WARNING);
+					term_log("Mapped bytes=", fmemmap(to_addr_t(hdr) + ph->p_offset, ph->p_memsz, ENTR_PRESENT(1) | ENTR_RW(1) | ENTR_USER(1) | ENTR_WRITETHROUGH(1), &pTracker, pdir), LOG_WARNING);
 					memset((void*)to_addr_t(hdr) + ph->p_offset, 0, ph->p_memsz);
 				}
 				else {
-					term_log("Mapped bytes=", fmemmap(ph->p_vaddr, ph->p_filesz, ENTR_PRESENT(1) | ENTR_RW(1) | ENTR_USER(1) | ENTR_WRITETHROUGH(1), &pTracker), LOG_WARNING);
+					term_log("Mapped bytes=", fmemmap(ph->p_vaddr, ph->p_filesz, ENTR_PRESENT(1) | ENTR_RW(1) | ENTR_USER(1) | ENTR_WRITETHROUGH(1), &pTracker, pdir), LOG_WARNING);
 					memcpy((void*)ph->p_vaddr, (const void*)to_addr_t(hdr) + ph->p_offset, ph->p_filesz);
 				}
 				break;
@@ -129,22 +130,22 @@ static void * load_elf_exec(ELF32_Header *hdr)
 				break;
 		}
 	}
+	reset_global_pdir();
 
-	//remember to swap aspaces in future(tm)
-	term_log("ELF Possibly Loaded", LOG_OK);
+	term_log("[ELF] Loaded", LOG_OK);
 	return entry;
 
 }
 
-void * ELF::load_elf(ELF32_Header *hdr)
+void * ELF::load_elf(ELF32_Header *hdr, dword * pdir /* = current_directory */)
 {
 	if(!check_elf_header(hdr))return nullptr;
-	term_log("ELF ok.", LOG_OK);
+	term_log("[ELF] ok.", LOG_OK);
 	switch(hdr->e_type){
 		case ET_REL:
 			return load_elf_rel(hdr);
 		case ET_EXEC:
-			return load_elf_exec(hdr);
+			return load_elf_exec(hdr, pdir);
 	}
 	return nullptr;
 

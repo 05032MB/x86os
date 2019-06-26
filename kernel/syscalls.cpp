@@ -21,7 +21,7 @@ void init_syscalls()
 	register_syscall(2,  (void*)static_cast<void (*) (const char*, byte)>(&term_print));
 	register_syscall(3,  (void*)static_cast<void (*) (int)>(&term_print_hex));
 	register_syscall(8,  (void*)static_cast<void (*) (char *)>(&get_wrapper));
-	register_syscall(10,  (void*)static_cast<void (*) ()>(&task::yield));
+	register_syscall(10,  (void*)static_cast<void (*) ()>(&task2::yield));
 }
 
 

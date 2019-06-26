@@ -9,6 +9,24 @@ dword page_directory[PTSIZE]; //4KiB /32 = 1024
 ALIGNED_4kB
 dword page_table_primary[PTSIZE]; //maps first 4MB, for kernel, stack
 
+ALIGNED_4kB
+dword * current_directory;
+
+//assembly functions
+__ASM_IMPORT{
+ dword _get_cr0(void);
+ dword _get_cr3(void);
+ dword _get_cr2(void);
+ 
+ //Flushes tlb buffers, needs to be called after page changes
+ void _reload_tlbs(void);
+
+ void __fastcall _write_cr0(dword);
+ void __fastcall _write_cr3(dword);
+ 
+}
+
+
 /*
 Purpose: Create page-aligned entry in page directory (new page table), or assigns existing one, with specified flags
 Params:
@@ -67,6 +85,49 @@ void * translate_virtual_to_physical(dword virtualaddr)
 	return ONLY_ADDR(sptable) ? reinterpret_cast<void *>(ONLY_ADDR(sptable) + (virtualaddr & 0xFFF)) : nullptr;
 }
 
+dword * clone_ptable(dword * pt)
+{
+	size_t size = PTSIZE;
+
+	term_log("[PG]Cloning table of size=",size,LOG_MINOR);
+
+	auto npt = reinterpret_cast<dword *>(__AALLOC(sizeof(dword) * size, 0x1000));
+
+	term_log_hex("[PG]Allocated clone at=", to_addr_t(npt), LOG_MINOR);
+
+	for(size_t i = 0; i < size; i++)
+	{
+			npt[i] = pt[i];
+	}
+	return npt;
+}
+
+dword * clone_pdir(dword * pd)
+{
+	size_t size = PTSIZE;
+
+	term_log("[PG]Cloning dir of size=",size,LOG_MINOR);
+
+	auto npd = reinterpret_cast<dword*>(__AALLOC(sizeof(dword)*size, 0x1000));
+
+	term_log_hex("[PG]Allocated clone at=", to_addr_t(npd), LOG_MINOR);
+
+	for(size_t i = 0; i < size; i++)
+	{
+		if(pd[i] != 0){
+			npd[i] = ONLY_DATA(pd[i]);
+			npd[i] |= to_addr_t(clone_ptable(reinterpret_cast<dword*>(ONLY_ADDR(pd[i])))), LOG_WARNING;
+		}else{
+			npd[i] = 0;
+		}
+	}
+	return npd;
+}
+
+void reset_global_pdir()
+{
+	set_page_dir(page_directory);
+}
 
 void page_fault_handler(const int_iden ii)
 {
@@ -103,7 +164,8 @@ void page_fault_handler(const int_iden ii)
 void set_page_dir(void *pg)
 {
 	_write_cr3(to_addr_t(pg) );
-	_write_cr0(0x80000000 | _get_cr0());
+
+	current_directory = reinterpret_cast<dword*>(pg);
 }
 
 void init_paging()
@@ -111,6 +173,7 @@ void init_paging()
 	init_primary_page_table();
 	
 	set_page_dir(page_directory);
+	_write_cr0(0x80000000 | _get_cr0());
 
 }
 
@@ -136,7 +199,7 @@ If page dir entry doesn't exist it will create one on the stack.
 Returns true on success, else false.
 Note that the function WILL NOT flush TLB buffers.
 */
-bool map_page(addr_t virt, addr_t phys, word flags, dword * page_directory = page_directory, mtracker *mt = nullptr, bool override = false)
+bool map_page(addr_t virt, addr_t phys, word flags, dword * page_directory = current_directory, mtracker *mt = nullptr, bool override = false)
 {
 	if(translate_virtual_to_physical(virt) != nullptr && override == false) return false; //na pewno nie?
 
@@ -166,7 +229,7 @@ Note that if function fails it will not roll back already made changes, you will
 Note that on success the function WILL flush TLB buffers
 Return: number of mapped bytes
 */
-size_t memmap(addr_t virt, size_t size, word flags, mtracker *mt, dword * page_directory = page_directory, bool override = false)
+size_t memmap(addr_t virt, size_t size, word flags, mtracker *mt, dword * page_directory = current_directory, bool override = false)
 {
 	if(mt == nullptr)return 0;
 
@@ -188,9 +251,10 @@ size_t memmap(addr_t virt, size_t size, word flags, mtracker *mt, dword * page_d
 	return size;
 }
 
-size_t fmemmap(addr_t virt, size_t size, word flags, mtracker *mt, dword * page_directory /*= page_directory*/)
+size_t fmemmap(addr_t virt, size_t size, word flags, mtracker *mt, dword * page_directory)
 {
-	return memmap(virt, size, flags, mt, page_directory, true);
+	if(page_directory == nullptr)return memmap(virt, size, flags, mt, current_directory, true);
+	else return memmap(virt, size, flags, mt, page_directory, true);
 }
 void init_paging_phase_2()
 {	

@@ -3,37 +3,41 @@
 
 #include <types.hpp>
 
-static unsigned top_pid = 1;
+static dword top_pid = 1;
 
-struct task_header_t{
+struct task_info{
+	dword pid;
+	addr_t entry;
+	addr_t mem_low;
+	addr_t mem_high;
+	addr_t stack_high;
+	addr_t heap_low;
 
-	const unsigned magic = 0xE451E;
-	unsigned pid;
+	dword * page_dir;
 
-};
-struct task_footer_t{
-	const unsigned magic = 0xE451F;
-};
+	//for context switching
+	struct reg_t{
+		dword eax,ebx,ecx,edx,edi,esi;
+		dword ebp, esp;
+		dword eip;
+		dword gs, fs, es, ds;
+		dword eflags;
+	};
+}__packed;
 
-class task{
-	task_header_t* header;
-	task_footer_t* footer;
+class task2{
 
-	offset_t entry;
-	offset_t stack_top;
-	unsigned pid = 1;
-
-	size_t memsize_max;
+	task_info *tinfo;
 
 public:
-	void prepare_task(task_header_t*, task_footer_t*, addr_t, size_t);
-	bool launch_task();
-
-	auto getPid(){return pid;};
+	byte prepare_task_from_elf(void * elf, void* sh, void* hl, dword *pd);
+	void launch(void);
+	void suspend();
 
 	static void yield();
 
 };
-extern class task only_task;
+
+extern class task2 only_task;
 
 #endif
