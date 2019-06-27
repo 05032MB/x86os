@@ -8,8 +8,13 @@
 
 extern void page_fault_handler(const int_iden); //in paging.hpp
 
+#ifdef HI_MEM_IDT
 idtptr idtp;
 idtseg idt[INTTOP];
+#else
+idtptr *idtp = reinterpret_cast<idtptr*>(0x500);
+idtseg *idt = reinterpret_cast<idtseg*>(to_addr_t(idtp) + sizeof(idtptr));
+#endif
 
 isr_func_t int_handlers[INTTOP];
 
@@ -71,18 +76,20 @@ void init_pic(byte low, byte high)
 
 void idt_install()
 {
-    idtp.limit = (sizeof (struct idtseg) * INTTOP) - 1;//limit = rozmiar - 1
-    idtp.base = (dword) &idt;
-	
-    //memset(idt, 0, sizeof(idt[0])*INTTOP-1); //memset(&idt, 0, 8*256);
+#ifdef HI_MEM_IDT
+	idtp.limit = (sizeof (struct idtseg) * INTTOP) - 1;
+	idtp.base = reinterpret_cast<dword> (&idt);
+	_lidt((idtptr*)&idtp);
+#else
+	idtp->limit = (sizeof (struct idtseg) * INTTOP) - 1;
+	idtp->base = to_addr_t(idt);
+	_lidt(idtp);
+#endif
 
-    _lidt((idtptr*)&idtp);
 }
 
 bool init_idt_seg(idtseg* ptr, int selector, int flags, int pointer)
 {
-	//add memset
-	//if(num > INTTOP-1)return false;
 	word low = pointer & 0xffff;
 	word high = (pointer & 0xffff0000) >> 16;
 	
