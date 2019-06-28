@@ -10,7 +10,7 @@
 #define SPIC1 0xA0
 #define SPIC2 0xA1
 
-#define INTTOP 256//256
+#define INTTOP 256
 
 //privilege levels
 #define RING_0 0x0

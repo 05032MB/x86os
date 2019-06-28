@@ -1,7 +1,7 @@
 #include <vga.hpp>
 
 // This is the x86's VGA textmode buffer. To display text, we write data to this memory location
-volatile uint16_t* vga_buffer = (uint16_t*)0xB8000;
+volatile word* vga_buffer = (word*)0xB8000;
 // By default, the VGA textmode buffer has a size of 80x25 characters
 const int VGA_COLS = 80;
 const int VGA_ROWS = 25;
@@ -32,7 +32,7 @@ void term_clear(char bchar)
 			// - B is the background color
 			// - F is the foreground color
 			// - C is the ASCII character
-			vga_buffer[index] = ((uint16_t)term_color << 8) | /*'.'*/ bchar;
+			vga_buffer[index] = ((word)term_color << 8) | /*'.'*/ bchar;
 		}
 	}
 }
@@ -84,7 +84,7 @@ void term_putc(char c, uint8_t color)
 	default: 
 		{
 			const size_t index = (VGA_COLS * term_row) + term_col; 
-			vga_buffer[index] = ((uint16_t)color << 8) | c;
+			vga_buffer[index] = ((word)color << 8) | c;
 			term_col ++;
 			break;
 		}

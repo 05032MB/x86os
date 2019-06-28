@@ -70,7 +70,7 @@ void init_gdt_entries();
 struct gdtptr{
 	word limit;
 	dword base;
-}__attribute__((packed));
+}__packed;
 
 
 struct gdtentry{
@@ -80,7 +80,7 @@ struct gdtentry{
 	byte access;
 	byte limflags; //limit 16-19 & flags 0-3
 	byte base3; //highest(24-31)
-}__attribute__((packed));
+}__packed;
 
 void gdt_install();
 
@@ -89,8 +89,8 @@ void init_gdt_entry(gdtentry* ptr,dword base, dword limit, dword aflags);
 
 sel_t get_segment_selector_GDT(short num, short priv);
 
-extern gdtptr gdtp;
-extern gdtentry gdt[GDTMAX];
+//extern gdtptr gdtp;
+//extern gdtentry gdt[GDTMAX];
 
 extern word KERNEL_CS;
 extern word KERNEL_DS;
@@ -127,22 +127,18 @@ struct tss_entry
    word gs, nil10;         
    word ldtr, nil11;        
    word T, iomba_offset; //T is debug trap(in reality 1 bit), iomba is I/O map base address field
-} __attribute__((packed));
+} __packed;
 
 
-//assembly
-extern "C" {
-__attribute__((fastcall))void _lgdt (gdtptr *i); 
-__attribute__((fastcall))void _on_gdt_change (sel_t data, sel_t code); //data&code selectors respectively
-__attribute__((fastcall))void _set_userspace_selectors (sel_t data, sel_t code); //data&code selectors respectively
-__attribute__((fastcall))void _gdt_flush(sel_t gdt_sel);
+__ASM_IMPORT {
+__fastcall void _lgdt (gdtptr *i); 
+__fastcall void _on_gdt_change (sel_t data, sel_t code); //data&code selectors respectively
+__fastcall void _set_userspace_selectors (sel_t data, sel_t code); //data&code selectors respectively
+__fastcall void _gdt_flush(sel_t gdt_sel);
 
-__attribute__((fastcall))void _tss_flush(sel_t tss_sel);
+__fastcall void _tss_flush(sel_t tss_sel);
 addr_t _get_esp(void);
 
 }
-
-#include <stdio.h>
-#include <stdlib.h>
 
 #endif

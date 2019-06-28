@@ -41,7 +41,7 @@ void term_print_hex(dword);
 void term_print_hex(dword, byte);
 
 
-//extern volatile uint16_t* vga_buffer;
+//extern volatile word* vga_buffer;
 extern const int VGA_COLS ;
 extern const int VGA_ROWS ;
 

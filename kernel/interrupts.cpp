@@ -13,7 +13,7 @@ idtptr idtp;
 idtseg idt[INTTOP];
 #else
 idtptr *idtp = reinterpret_cast<idtptr*>(0x500);
-idtseg *idt = reinterpret_cast<idtseg*>(to_addr_t(idtp) + sizeof(idtptr));
+idtseg *idt = reinterpret_cast<idtseg*>(idtp + sizeof(idtptr));
 #endif
 
 isr_func_t int_handlers[INTTOP];
@@ -82,7 +82,7 @@ void idt_install()
 	_lidt((idtptr*)&idtp);
 #else
 	idtp->limit = (sizeof (struct idtseg) * INTTOP) - 1;
-	idtp->base = to_addr_t(idt);
+	idtp->base = reinterpret_cast<dword>(idt);
 	_lidt(idtp);
 #endif
 

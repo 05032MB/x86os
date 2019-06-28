@@ -4,19 +4,28 @@
 #include <types.hpp>
 #include <logger.hpp>
 
+#ifdef HI_MEM_GDT
 gdtptr gdtp;
 gdtentry gdt[GDTMAX];
+#else
+gdtptr *gdtp = reinterpret_cast<gdtptr*>(0x600);
+gdtentry *gdt = reinterpret_cast<gdtentry*>(0x7E00); //1542
+#endif
 tss_entry tss_main;
 
 __ASM_IMPORT void * auxillary_stack_top;
 
 void gdt_install(unsigned num)//num - number of entries
 {
-	gdtp.base = (dword)&gdt;
-	
+#ifdef HI_MEM_GDT
+	gdtp.base = reinterpret_cast<dword>(&gdt);
 	gdtp.limit =( sizeof(struct gdtentry) * num )-1; //<--!
-	
 	_lgdt((gdtptr*)&gdtp);
+#else
+	gdtp->base = reinterpret_cast<dword>(gdt);
+	gdtp->limit =( sizeof(struct gdtentry) * num )-1; //<--!
+	_lgdt(gdtp);
+#endif
 
 }
 /*
@@ -69,13 +78,15 @@ void init_gdt_entries()
 	
 	//tss_main.esp2 = 0xA00000+200;
 
-	tss_main.cs   = get_segment_selector_GDT(1,3);
+	tss_main.cs = get_segment_selector_GDT(1,3);
 	tss_main.ss = tss_main.ds = tss_main.es = tss_main.fs = tss_main.gs = get_segment_selector_GDT(2,3);
 }
 
 void init_gdt()
 {
 	memset(gdt, 0, sizeof(gdt[0])*GDTMAX);
+	memset(&tss_main, 0, sizeof(tss_entry));
+
 	init_gdt_entries();
 	gdt_install(GDTMAX);
 
