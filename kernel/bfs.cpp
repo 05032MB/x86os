@@ -23,7 +23,7 @@ static d_node *initrd_readdir(initrd_virtual_node *node, dword index)
 	for(i=0; node[i].inode != initrd_nodes[i].inode && i < inodes_amount; i++ );  //wyszukujemy inoda
 	if(i == inodes_amount)return nullptr;
 
-	if(sizeof(bfs_dirblock)*index >= initrd_inodes[i].eof_offset)return nullptr;//jeœli chce siê odwo³aæ do nieistniej¹cego obiektu
+	if(sizeof(bfs_dirblock)*index >= initrd_inodes[i].eof_offset)return nullptr;//jeï¿½li chce siï¿½ odwoï¿½aï¿½ do nieistniejï¿½cego obiektu
 	
 	bfs_dirblock *db = reinterpret_cast<bfs_dirblock *> ( location + initrd_inodes[i].block_pointer + sizeof(bfs_dirblock)*index  ); //pobieramy wskaznik na pocz. zaw. katalogu, i przemieszczamy sie pod indeks
 	

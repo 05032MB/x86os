@@ -7,7 +7,7 @@ CXX:=i686-elf-g++
 AR:=i686-elf-ar
 
 CFLAGS:=$(CFLAGS) -ffreestanding -Wall -Wextra
-CPPFLAGS:=$(CPPFLAGS) -Iinclude -I$(KERNDIR)/include -D__is_libk -ffreestanding
+CPPFLAGS:=$(CPPFLAGS) -Iinclude -I$(KERNDIR)/include -D__is_libk -ffreestanding -std=c++17
 
 LIBK_CFLAGS:=$(CFLAGS)
 LIBK_CPPFLAGS:= -D__is_libk $(CPPFLAGS)

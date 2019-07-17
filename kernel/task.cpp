@@ -20,7 +20,7 @@ byte task2::prepare_task_from_elf(void * elf, void* sh, void* hl, dword * pd)
 	this->tinfo->entry = to_addr_t(entr);
 
 	this->tinfo->stack_high = to_addr_t(sh);
-
+	
 	return 0;
 
 }

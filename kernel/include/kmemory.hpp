@@ -105,6 +105,7 @@ Returns:
 ->end address (fin)
 
 */
+/*
 addr_t ubermalloc(addr_t where, size_t size, bool p_align, addr_t *fin );
 
 void init_heap(addr_t);
@@ -119,7 +120,9 @@ extern heap sysheap;
 #define __SALLOC(obj) __ALLOC(sizeof(obj))	//simple alloc macro
 #define __SCALLOC(obj, obj2) reinterpret_cast<obj2>(__SALLOC(obj))//simple casting allocation
 #define _SCALLOC(obj) reinterpret_cast<obj*>(__SALLOC(obj))//even simpler casting allocation (so only one underscore)
+*/
 
+#include <kheap.hpp>
 extern void* endkernel; //from linkerscript, address of kernel ending
 extern void* begkernel; //from linkerscript, address of kernel beginning
 extern void* prekernel; //0,probably

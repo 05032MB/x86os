@@ -1,0 +1,18 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build lib and kernel, deploy, launch qemu",
+            "type": "shell",
+            "command": "cd ./lib ; make install ; cd ../kernel ; make all ; ./deploy.bat ; cd .. ; cd ./utility/isogen ; ./qemu_launch.bat",
+            "windows": {
+                "command": "powershell -nologo -executionpolicy bypass -file ./.vscode/script.ps1"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

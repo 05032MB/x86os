@@ -53,6 +53,7 @@ i686-elf-g++ --version
 make --version
 nasm --version
 qemu-system-i386 --version
+mkisofs --version
 ```
 
 (Each tool should print short info about its version.)
@@ -74,7 +75,7 @@ qemu-system-i386 --version
    deploy.bat
    ```
 
-3. Navigate to `isogen` folder and type:
+3. Navigate to `utility/isogen` folder and type:
 
    ```bat
    qemu_launch.bat

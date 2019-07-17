@@ -3,6 +3,7 @@
 #include <types.hpp>
 #include <interrupts.hpp>
 #include <kmemory.hpp>
+#include <kheap.hpp>
 #include <gdt.hpp>
 #include <paging.hpp>
 
@@ -15,6 +16,8 @@
 #include <vga.hpp>
 #include <syscalls.hpp>
 
+//To test syscall function, TODO: remove test
+#include "_os.h"
 
 //Assembler functions
 
@@ -144,7 +147,9 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 	
 	term_print("Boot completed\n");
 	term_print("----------------------\n",VGA_COLOR_MAGENTA);
-	
+
+	syscall(2, "Just to test syscall template in magenta", VGA_COLOR_MAGENTA);
+
 	only_task.launch();
 	//switch_to_ring_3((void(*)())btstrp/*_lets_err*/);
 	//switch_to_ring_0();

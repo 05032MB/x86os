@@ -5,7 +5,7 @@ LIBK=../lib/libk.a
 CXX:=i686-elf-g++
 ASM:=nasm
 
-CPPFLAGS:=$(CPPFLAGS) -I../lib/include -I./include -D__k_debug -ffreestanding -O2 -Wall -Wextra -fno-exceptions  -fno-rtti -std=c++17
+CPPFLAGS:=$(CPPFLAGS) -I../lib/include -I./include -D__k_debug -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -std=c++17
 
 CSOURCES=\
 $(wildcard $(SRC)/*.cpp)
