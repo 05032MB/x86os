@@ -116,8 +116,8 @@ static void * load_elf_exec(ELF32_Header *hdr, dword * pdir)
 					return nullptr;
 				}
 				else if(ph->p_memsz > ph->p_filesz){
-					term_log("Mapped bytes=", fmemmap(to_addr_t(hdr) + ph->p_offset, ph->p_memsz, ENTR_PRESENT(1) | ENTR_RW(1) | ENTR_USER(1) | ENTR_WRITETHROUGH(1), &pTracker, pdir), LOG_WARNING);
-					memset((void*)to_addr_t(hdr) + ph->p_offset, 0, ph->p_memsz);
+					term_log("Mapped bytes=", fmemmap(ph->p_vaddr, ph->p_memsz, ENTR_PRESENT(1) | ENTR_RW(1) | ENTR_USER(1) | ENTR_WRITETHROUGH(1), &pTracker, pdir), LOG_WARNING);
+					memset((void*)ph->p_vaddr, 0, ph->p_memsz);
 				}
 				else {
 					term_log("Mapped bytes=", fmemmap(ph->p_vaddr, ph->p_filesz, ENTR_PRESENT(1) | ENTR_RW(1) | ENTR_USER(1) | ENTR_WRITETHROUGH(1), &pTracker, pdir), LOG_WARNING);
