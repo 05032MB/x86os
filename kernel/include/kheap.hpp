@@ -6,6 +6,12 @@
 
 #define KHEAP_DEBUG
 
+#ifdef __GNUC__ //silence irritating warnings
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wignored-qualifiers"
+#pragma GCC diagnostic ignored "-Wpointer-arith"
+#endif
+
 template<class T>
 struct remove_const
 {
@@ -268,5 +274,9 @@ inline void init_heap(addr_t begin, size_t length = 1048576u * 2u)
 #define __SALLOC(obj) __ALLOC(sizeof(obj))							//simple alloc macro
 #define __SCALLOC(obj, obj2) reinterpret_cast<obj2>(__SALLOC(obj))	//simple casting allocation
 #define _SCALLOC(obj) reinterpret_cast<obj*>(__SALLOC(obj))			//even simpler casting allocation (so only one underscore)
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #endif

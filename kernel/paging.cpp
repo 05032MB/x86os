@@ -116,7 +116,7 @@ dword * clone_pdir(dword * pd)
 	{
 		if(pd[i] != 0){
 			npd[i] = ONLY_DATA(pd[i]);
-			npd[i] |= to_addr_t(clone_ptable(reinterpret_cast<dword*>(ONLY_ADDR(pd[i])))), LOG_WARNING;
+			npd[i] |= to_addr_t(clone_ptable(reinterpret_cast<dword*>(ONLY_ADDR(pd[i]))));
 		}else{
 			npd[i] = 0;
 		}
@@ -256,6 +256,42 @@ size_t fmemmap(addr_t virt, size_t size, word flags, mtracker *mt, dword * page_
 	if(page_directory == nullptr)return memmap(virt, size, flags, mt, current_directory, true);
 	else return memmap(virt, size, flags, mt, page_directory, true);
 }
+void destroy_pagedir_entry_if_empty(dword* direntr)
+{
+	if(ONLY_ADDR(*direntr) == 0)return;
+	for(size_t i = 0; i < PTSIZE; i++)
+	{
+		if(  ( reinterpret_cast<dword*>(ONLY_ADDR(*direntr)) )[i] != 0  )return;
+	}
+	destroy_pagedir_entry(direntr);
+
+}
+void unmap_page(addr_t virt, dword * page_directory = current_directory, mtracker *mt = nullptr, bool cull = false)
+{
+	dword tabe = (virt >> 12) >> 10;
+	dword tabx = (virt >> 12) & 0x3FF; 
+
+	dword * fptr = (reinterpret_cast<dword*>( ( reinterpret_cast<dword*>(ONLY_ADDR(page_directory[tabe])) )[tabx] ) ); 
+	mt->setFrame(ONLY_ADDR(*fptr));
+	if(cull)destroy_pagedir_entry_if_empty(&page_directory[tabe]);
+
+}
+void unmap(addr_t virt, size_t size, mtracker *mt, dword* page_directory /*=nullptr*/)
+{
+	for(size_t i = 0; i < size; i+= 0x1000)
+	{
+		unmap_page(virt + i, page_directory, mt, false);
+	}
+}
+/*void destroy_aspace(dword * page_directory)
+{
+	size_t size = PTSIZE;
+	for(size_t i = 0; i < PTSIZE; i++)
+	{
+		destroy_pagedir_entry(&page_directory[i]);
+	}
+
+}*/
 void init_paging_phase_2()
 {	
 

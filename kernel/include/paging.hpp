@@ -12,7 +12,7 @@
 #define ALIGNED_4kB __attribute__((aligned(4096)))
 #define ALIGNED_4MB __attribute__((aligned(4194304)))
 
-extern ALIGNED_4kB dword page_directory[PTSIZE];
+//extern ALIGNED_4kB dword page_directory[PTSIZE];
 //extern ALIGNED_4kB dword *current_directory;
 
 void init_paging();
@@ -70,6 +70,7 @@ void set_page_dir(void *pg);
 void reset_global_pdir();
 
 size_t fmemmap(addr_t virt, size_t size, word flags, mtracker *mt, dword * page_directory = nullptr);
+//void destroy_aspace(dword * page_directory);
 
 dword * clone_ptable(dword * pt);
 dword * clone_pdir(dword * pd);

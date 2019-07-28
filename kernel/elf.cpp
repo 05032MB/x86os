@@ -112,7 +112,7 @@ static void * load_elf_exec(ELF32_Header *hdr, dword * pdir)
 				term_log("Loading LOAD section into: ",ph->p_vaddr , LOG_MINOR);
 				if(ph->p_vaddr < 0xA00000)
 				{
-					term_log("An embarassing error.", LOG_CRITICAL);
+					term_log("Invalid start address. Change your linker script. \n(HINT: start above 0xA00000)", LOG_CRITICAL);
 					return nullptr;
 				}
 				else if(ph->p_memsz > ph->p_filesz){

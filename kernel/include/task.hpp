@@ -3,9 +3,15 @@
 
 #include <types.hpp>
 
-static dword top_pid = 1;
+class task_basic_interface{
+public:
+	virtual void launch(void) = 0;
+	virtual void exit(byte) = 0;
+};
 
-struct task_info{
+class task2 /*: public task_basic_interface*/{
+
+	struct task_info{
 	dword pid;
 	addr_t entry;
 	addr_t mem_low;
@@ -22,19 +28,37 @@ struct task_info{
 		dword eip;
 		dword gs, fs, es, ds;
 		dword eflags;
-	};
-}__packed;
-
-class task2{
-
-	task_info *tinfo;
+	}regs;
+} *tinfo{nullptr};
 
 public:
+
+	enum class state{
+		INCOMING,
+		RUNNING,
+		READY,
+		ENDING,
+		CALLQUITS
+	};
+
 	byte prepare_task_from_elf(void * elf, void* sh, void* hl, dword *pd);
 	void launch(void);
-	void suspend();
+	void suspend(const task_info::reg_t &rgs);
+	void exit(byte);
+
+	void set_state(task2::state);
+	task2::state get_state()const;
+
+	dword get_pid()const{return tinfo->pid;}
+
+	task2();
+	task2(task_info *);
+	~task2();
 
 	static void yield();
+
+private:
+	state proc_state{task2::state::INCOMING};
 
 };
 

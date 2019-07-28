@@ -15,7 +15,7 @@ ebx, ecx, edx, edi, esi - parameters
 syscalls are not to utilize stack to pass parameters
 */
 
-#define SYSCALL_MAX 10
+#define SYSCALL_MAX 11
 
 //extern void* syscalls[SYSCALL_MAX];
 

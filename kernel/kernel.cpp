@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <types.hpp>
 #include <interrupts.hpp>
-#include <kmemory.hpp>
+//#include <kmemory.hpp>
 #include <kheap.hpp>
 #include <gdt.hpp>
 #include <paging.hpp>
@@ -15,6 +15,8 @@
 #include <input.hpp>
 #include <vga.hpp>
 #include <syscalls.hpp>
+#include <overseer.hpp>
+#include <scheduler.hpp>
 
 //To test syscall function, TODO: remove test
 #include "_os.h"
@@ -31,6 +33,9 @@ void init_idt();
 void _lets_err();
 void __attribute__((fastcall))switch_to_ring_3(void(*)());
 void __attribute__((fastcall))switch_to_ring_0();
+
+void _init();
+void _fini();
 }
 
 #include <multiboot.hpp>
@@ -109,18 +114,26 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
    
 	}
 	term_print("\n");
-	
+
+	term_log("mod_last_end is=", to_addr_t(mod_last_end), LOG_MINOR);
+
 	init_gdt();
 	term_print("\nMemory segmented\n");
 	init_interrupts(); //add support for APIC if available
 	term_print("Interrupts are configured\n");
 	init_paging();
 	term_print("Paging is ready (1/2)\n");
-	init_heap(mod_last_end);
+	init_heap(mod_last_end );
 	term_print("Sysheap ready\n");
 	
+
 	init_paging_phase_2();
 	term_print("Paging is ready (2/2) \n");
+
+	non_preempt_fifo test_sched;
+	overseer().add_scheduler(&test_sched);
+	init_overseer();
+	term_log("overseer started.", LOG_OK);
 
 	init_syscalls();
 	term_print("System calls initialized\n");
@@ -141,6 +154,10 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 	//auto btstrp = ELF::load_elf(reinterpret_cast< ELF::ELF32_Header* >( *reinterpret_cast<dword*> (  mbinfo->mods_addr +16  ) ) );
 
 	only_task.prepare_task_from_elf( voidcast(*reinterpret_cast<dword*> (  mbinfo->mods_addr +16  ) ) , voidcast(0xA00050), nullptr, current_directory);
+	task2 t2;
+	t2.prepare_task_from_elf( voidcast(*reinterpret_cast<dword*> (  mbinfo->mods_addr +16  ) ) , voidcast(0xA00050), nullptr, current_directory);
+	test_sched.accept_task(&only_task);
+	test_sched.accept_task(&t2);
 
 	term_print("Hello, World!\n", VGA_COLOR_GREEN);
 	term_print("Welcome to the kernel.\n", VGA_COLOR_CYAN << 4);
@@ -150,10 +167,14 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 
 	syscall(2, "Just to test syscall template in magenta", VGA_COLOR_MAGENTA);
 
-	only_task.launch();
+	overseer().schedule();
+	overseer().seq_dispatch();
+	//test_sched.dispatch();
+	//auto * t = &only_task;
+	//t->launch();
 	//switch_to_ring_3((void(*)())btstrp/*_lets_err*/);
 	//switch_to_ring_0();
-	term_print("\nSuccessfully tested ring3");
+	term_print("\nKernel stopping, no tasks initiated.");
 	
 	term_print("\nPress any key (3 to GP fault)\n");
 	while(1){
@@ -164,5 +185,5 @@ extern "C" void kernel_main(multiboot_info_t *mbinfo)
 		//char c = getScancode();
 		//term_putc(c);
 	}
-	
+	_fini();
 }

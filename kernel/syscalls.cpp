@@ -1,6 +1,6 @@
 #include <syscalls.hpp>
 #include <input.hpp>
-#include <task.hpp>
+#include <overseer.hpp>
 #include <logger.hpp>
 
 __ASM_IMPORT{
@@ -20,12 +20,12 @@ void init_syscalls()
 	
 	//void *test = (void*)static_cast<void (*) (char, byte)>(&test_syscall);
 	//term_print_dec((int)test);
-	
+
 	register_syscall(1,  (void*)static_cast<void (*) (char, byte)>(&term_putc));
 	register_syscall(2,  (void*)static_cast<void (*) (const char*, byte)>(&term_print));
 	register_syscall(3,  (void*)static_cast<void (*) (int)>(&term_print_hex));
 	register_syscall(8,  (void*)static_cast<void (*) (char *)>(&get_wrapper));
-	register_syscall(10,  (void*)static_cast<void (*) ()>(&task2::yield));
+	register_syscall(10,  (void*)static_cast<void (*) (byte)>(&sched_manager::exit_call));
 }
 
 
@@ -48,6 +48,7 @@ void syscall_handler(const int_iden ii)
 	if(ii.eax >= SYSCALL_MAX)return;
 	
 	void* jmploc = syscalls[ii.eax];
+	if(to_addr_t(jmploc) == 0)return;
 	
 	int val;
 

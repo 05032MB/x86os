@@ -154,12 +154,12 @@ void _c_int_handler(const int_iden ii)
 	};
 	msg[80]="SYSCALL";
 
-	#ifdef __k_debug
+	/*#ifdef __k_debug
 	//dputs(ii.iden);
 	//if(ii.iden <= 48 || ii.iden == 80)puts(msg[ii.iden]);
-	int z =0;
-	//if(ii.iden != 33){/*halt();*/while(z++ < 100000000)_nop();}
-	#endif
+	//int z =0;
+	//if(ii.iden != 33){halt();while(z++ < 100000000)_nop();}
+	#endif*/
 	
 	//dputs((int)int_handlers[ii.iden]);
 	if(int_handlers[ii.iden])int_handlers[ii.iden](ii);
