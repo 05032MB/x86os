@@ -3,6 +3,7 @@
 
 #include <logger.hpp>
 #include <critical.hpp>
+#include <kmemory.hpp>
 
 #define KHEAP_DEBUG
 
@@ -258,7 +259,7 @@ extern kheap_default kheap_instance;
 
 // It is possible to make kheap constructor private,
 // and this function can be it's friend.
-
+/*
 inline void init_heap(addr_t begin, size_t length = 1048576u * 2u)
 {
 // WARNING!
@@ -274,7 +275,7 @@ inline void init_heap(addr_t begin, size_t length = 1048576u * 2u)
 #define __SALLOC(obj) __ALLOC(sizeof(obj))							//simple alloc macro
 #define __SCALLOC(obj, obj2) reinterpret_cast<obj2>(__SALLOC(obj))	//simple casting allocation
 #define _SCALLOC(obj) reinterpret_cast<obj*>(__SALLOC(obj))			//even simpler casting allocation (so only one underscore)
-
+*/
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif

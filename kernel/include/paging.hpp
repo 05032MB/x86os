@@ -50,15 +50,6 @@ void init_paging_phase_2();
 //----------------Pewnie tego nie użyję
 using page_t = dword;
 
-struct page_table_t{
-	page_t pages[PTSIZE];
-};
-
-struct page_dir_t{
-	page_table_t *tables[PTSIZE]; //pointers to above
-	addr_t physAddr[PTSIZE]; //physical address for tables
-	addr_t selfPhys; //physical address for self
-};
 
 //---------------
 
@@ -66,14 +57,16 @@ struct page_dir_t{
 
 void page_fault_handler(const int_iden ii);
 
-void set_page_dir(void *pg);
-void reset_global_pdir();
+__ASM_IMPORT { void set_page_dir(void *pg);
+void reset_global_pdir(); }
 
 size_t fmemmap(addr_t virt, size_t size, word flags, mtracker *mt, dword * page_directory = nullptr);
-//void destroy_aspace(dword * page_directory);
+void destroy_aspace(dword * page_directory);
 
 dword * clone_ptable(dword * pt);
 dword * clone_pdir(dword * pd);
+
+dword * get_global_pdir();
 
 
 #endif

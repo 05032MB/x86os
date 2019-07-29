@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <paging.hpp>
 
 extern void page_fault_handler(const int_iden); //in paging.hpp
 
@@ -143,7 +144,9 @@ void register_interrupt_handler(word interrupt, isr_func_t fun)
 __nooptimize
 void _c_int_handler(const int_iden ii) 
  {
-	
+	auto *dir = get_global_pdir();
+	reset_global_pdir();
+
 	const char* msg[] = {
 	"#DE", "#DB", "NMI", "#BP", "#OF", "#BR",
 	"#UD", "#NM", "#DF", "CoprocessorSegmentOverrun", "#TS", "#NP", "#SS",
@@ -169,6 +172,8 @@ void _c_int_handler(const int_iden ii)
 		slave_eoi();
 		master_eoi();
 	}
+	
+	set_page_dir(voidcast(dir));
 	
  }
 

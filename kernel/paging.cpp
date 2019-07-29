@@ -50,8 +50,8 @@ Return: pointer to the destroyed table
 */
 void * destroy_pagedir_entry(dword * dir_entry)
 {
-	__FREE(voidcast(ONLY_ADDR(*dir_entry)));
 	auto ret = voidcast(ONLY_ADDR(*dir_entry));
+	__FREE(voidcast(ONLY_ADDR(*dir_entry)));
 	*dir_entry = 0;
 	return ret;
 }
@@ -168,6 +168,11 @@ void set_page_dir(void *pg)
 	current_directory = reinterpret_cast<dword*>(pg);
 }
 
+dword * get_global_pdir()
+{
+	return current_directory;
+}
+
 void init_paging()
 {
 	init_primary_page_table();
@@ -282,16 +287,18 @@ void unmap(addr_t virt, size_t size, mtracker *mt, dword* page_directory /*=null
 	{
 		unmap_page(virt + i, page_directory, mt, false);
 	}
+	_reload_tlbs();
 }
-/*void destroy_aspace(dword * page_directory)
+void destroy_aspace(dword * page_directory)
 {
 	size_t size = PTSIZE;
 	for(size_t i = 0; i < PTSIZE; i++)
 	{
 		destroy_pagedir_entry(&page_directory[i]);
 	}
+	__FREE(voidcast(page_directory));
 
-}*/
+}
 void init_paging_phase_2()
 {	
 
@@ -318,26 +325,6 @@ void init_paging_phase_2()
 	//term_log_hex("0xA00001->",(dword)translate_virtual_to_physical(0xA00001),LOG_CRITICAL);
 	//asm("hlt ;");
 	//asm("hlt ;");
-	/*
-	if(!memres(0, 0xE00000))
-	{
-		term_log("Kernel mem reservation failed.", LOG_CRITICAL);
-		kpanic("No sorry.");
-	}
-	term_log("Memory for kernel reserved, up to: ", 0xE00000, LOG_OK);*/
+	
 
-}
-
-bool memres(addr_t lo, addr_t hi)
-{
-	for(size_t i = lo; i <= hi; i++ )
-		if(pTracker.testFrame(i)){
-			term_log("[MEMRES:] Failed to reserve: ", i, LOG_MINOR);
-			return false;
-		}
-	for(size_t i = lo; i <= hi; i++ ){
-		pTracker.setFrame(i);
-		//init_frame()
-	}
-	return true;
 }

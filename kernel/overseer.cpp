@@ -4,6 +4,7 @@
 #include <scheduler.hpp>
 #include <logger.hpp>
 #include <syscalls.hpp>
+#include <critical.hpp>
 
 #include <kheap.hpp>
 #include <task.hpp>
@@ -60,6 +61,7 @@ void sched_manager::seq_dispatch()
 		active_sched->dispatch();
 	}
 	active_sched = nullptr;
+	kpanic("[Overseer] All schedulers refusing dispatch.");
 }
 
 void sched_manager::dispatch(unsigned n)

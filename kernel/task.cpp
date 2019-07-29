@@ -71,7 +71,9 @@ task2 only_task;
 void task2::exit(byte ecode)
 {
 	set_state(state::ENDING);
-	//destroy_aspace(this->tinfo->page_dir);
+	//reset_global_pdir();
+	destroy_aspace(this->tinfo->page_dir);
+	//asm("hlt");
 	//close files
 	//close streams etc.
 	set_state(state::CALLQUITS);
